@@ -1,10 +1,13 @@
+#!/usr/bin/python3
+"""main file to see execution"""
+
 from io import StringIO
-from parse import parse
-from tokenize import tokenize
 from pprint import pprint
+from tokenizer import tokenize
+from parse import parse
 
 
-json_raw="""{
+JSON_RAW="""{
     "test1":  true  ,
     "arr":[1,2],
     "test2": { "name":1 }
@@ -12,13 +15,7 @@ json_raw="""{
 
 
 if __name__ == '__main__':
-    f = StringIO(json_raw)
-
-    a = [i for i in tokenize(f)]
+    f = StringIO(JSON_RAW)
+    a = list(tokenize(f))
     ret = parse(a)
     pprint(ret)
-
-
-
-def test_pass():
-    assert True
