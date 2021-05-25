@@ -87,12 +87,31 @@ def parse(tokens:List):
 
 #################################### TESTS ###################################
 
-def test_empty():
-    tokens = [ ('{',0), ('}',1) ]
-    expected = {}
-    assert parse(tokens) == expected
+import pytest
 
-def test_empty():
-    tokens = [ ('{',0), ('}',1) ]
-    expected = {}
+testdata = [
+(
+    [ ('{',0), ('}',1) ],
+    {}
+),
+(
+    [('{', 0),('S', 1, 'a'), (':', 4), ('v', 5, '0'), ('}', 6)],
+    {"a":'0'}
+),
+(
+    [('{', 0), ('S', 1, 'a'), (':', 4), ('v', 5, '0'), (',', 6), ('S',7,'b'),(':',10), ('v',11,'1'),('}',12)],
+    {"a":'0',"b":'1'}
+),
+(
+    [('{', 0), ('S', 1, 'a'), (':', 4), ('[', 5), ('v', 6, '1'), (',',7),('v',8,'2'), (']',9),('}',10)],
+    {"a":['1','2']}
+),
+(
+    [('{', 0), ('S', 1, 'a'), (':', 4), ('{', 5), ('}', 6), ('}', 7)],
+    {"a":{}}
+)
+]
+
+@pytest.mark.parametrize("tokens,expected", testdata)
+def test_tokenize(tokens, expected):
     assert parse(tokens) == expected

@@ -37,25 +37,20 @@ def tokenize(f):
         else:
             mem += c
 
-
 #################################### TESTS ###################################
 
-def test_empty_object():
-    f = StringIO('{}')
-    ret = [i for i in tokenize(f)]
-    assert ret == [ ('{',0), ('}',1) ]
+import pytest
 
-def test_object_with_one():
-    json = '{"a":0}'
-    ret = [i for i in tokenize( StringIO(json) ) ]
-    assert ret ==  [('{', 0), ('S', 1, 'a'), (':', 4), ('v', 5, '0'), ('}', 6)]
+testdata = [
+    ('{}',           [('{',0), ('}',1) ]),
+    ('{"a":0}',      [('{', 0), ('S', 1, 'a'), (':', 4), ('v', 5, '0'), ('}', 6)]),
+    ('{"a":0,"b":1}',[('{', 0), ('S', 1, 'a'), (':', 4), ('v', 5, '0'), (',', 6), ('S',7,'b'),(':',10), ('v',11,'1'),('}',12)]),
+    ('{"a":[1,2]}',  [('{', 0), ('S', 1, 'a'), (':', 4), ('[', 5), ('v', 6, '1'), (',',7),('v',8,'2'), (']',9),('}',10)]),
+    ('{"a":{}}',     [('{', 0), ('S', 1, 'a'), (':', 4), ('{', 5), ('}', 6), ('}', 7)]),
+]
 
-def test_object_with_two():
-    json = '{"a":0,"b":1}'
-    ret = [i for i in tokenize( StringIO(json) ) ]
-    assert ret ==  [('{', 0), ('S', 1, 'a'), (':', 4), ('v', 5, '0'), (',', 6), ('S',7,'b'),(':',10), ('v',11,'1'),('}',12)]
-
-def test_object_with_one_array():
-    json = '{"a":[1,2]}'
-    ret = [i for i in tokenize( StringIO(json) ) ]
-    assert ret ==  [('{', 0), ('S', 1, 'a'), (':', 4), ('[', 5), ('v', 6, '1'), (',',7),('v',8,'2'), (']',9),('}',10)]
+@pytest.mark.parametrize("json,expected", testdata)
+def test_tokenize(json, expected):
+    f=StringIO(json)
+    ret=[i for i in tokenize(f)]
+    assert ret == expected
