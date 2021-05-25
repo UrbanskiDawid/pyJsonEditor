@@ -1,56 +1,82 @@
-
+"""tokenize readable handle to tokens"""
 from io import StringIO
-from enum import Enum
+import pytest
 
 
-def tokenize(f):
+def tokenize(handle):
+    """read handle and turn it into tokens"""
     run = True
     pos = -1
     mem = ""
     while run:
         pos += 1
-        c = f.read(1)
-        if not c:
+        char = handle.read(1)
+        if not char:
             run = False
             break
-        elif c in ['[', ']', '{', '}', ",", ":"]:
-            if len(mem.strip()):
+        if char in ['[', ']', '{', '}', ",", ":"]:
+            mem=mem.strip()
+            if mem:
                 yield("v", pos-len(mem), mem)
             mem = ""
-            yield (c, pos)  # open
-        elif c in ['"', "'"]:
-            start_c = c
+            yield (char, pos)  # open
+        elif char in ['"', "'"]:
+            start_c = char
             pos_start = pos
             mem = ""
             while True:
-                c_prev = c
-                c = f.read(1)
+                c_prev = char
+                char = handle.read(1)
                 pos += 1
-                if not c:
+                if not char:
                     run = False
                     break
-                elif c == start_c and c_prev != "\\":
+                if char == start_c and c_prev != "\\":
                     break
-                mem += c
+                mem += char
             yield ('S', pos_start, mem)
             mem = ""
         else:
-            mem += c
+            mem += char
 
 #################################### TESTS ###################################
 
-import pytest
 
 testdata = [
-    ('{}',           [('{',0), ('}',1) ]),
-    ('{"a":0}',      [('{', 0), ('S', 1, 'a'), (':', 4), ('v', 5, '0'), ('}', 6)]),
-    ('{"a":0,"b":1}',[('{', 0), ('S', 1, 'a'), (':', 4), ('v', 5, '0'), (',', 6), ('S',7,'b'),(':',10), ('v',11,'1'),('}',12)]),
-    ('{"a":[1,2]}',  [('{', 0), ('S', 1, 'a'), (':', 4), ('[', 5), ('v', 6, '1'), (',',7),('v',8,'2'), (']',9),('}',10)]),
-    ('{"a":{}}',     [('{', 0), ('S', 1, 'a'), (':', 4), ('{', 5), ('}', 6), ('}', 7)]),
+(
+    '{}',
+    [('{',0), ('}',1) ]
+),
+(
+    '{"a":0}',
+    [('{', 0), ('S', 1, 'a'), (':', 4), ('v', 5, '0'), ('}', 6)]
+),
+(
+    '{"a":0,"b":1}',
+    [('{', 0),
+      ('S', 1, 'a'), (':', 4), ('v', 5, '0'),
+      (',', 6),
+      ('S',7,'b'),(':',10), ('v',11,'1'),
+      ('}',12)]
+),
+(
+    '{"a":[1,2]}',
+    [('{', 0),
+     ('S', 1, 'a'), (':', 4),
+        ('[', 5),
+            ('v', 6, '1'), (',',7),('v',8,'2'),
+        (']',9),
+    ('}',10)]
+),
+(
+    '{"a":{}}',
+    [('{', 0), ('S', 1, 'a'), (':', 4), ('{', 5), ('}', 6), ('}', 7)]
+),
 ]
 
 @pytest.mark.parametrize("json,expected", testdata)
 def test_tokenize(json, expected):
-    f=StringIO(json)
-    ret=[i for i in tokenize(f)]
+    """ test tokenize method"""
+    handle = StringIO(json)
+    ret=list(tokenize(handle))
     assert ret == expected
