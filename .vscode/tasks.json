@@ -7,6 +7,11 @@
             "label": "test",
             "type": "shell",
             "command": "python3 -m pytest -v *.py"
-        }
+        },
+        {
+            "label": "lint",
+            "type": "shell",
+            "command": "python3 -m  pylint `ls -R|grep .py$|xargs`"
+        },
     ]
 }
