@@ -72,6 +72,10 @@ testdata = [
     '{"a":{}}',
     [('{', 0), ('S', 1, 'a'), (':', 4), ('{', 5), ('}', 6), ('}', 7)]
 ),
+(
+    '{"a',
+    [('{', 0), ("S",1,'a')]
+)
 ]
 
 @pytest.mark.parametrize("json,expected", testdata)
