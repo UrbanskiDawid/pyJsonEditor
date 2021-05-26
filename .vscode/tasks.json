@@ -6,16 +6,19 @@
         {
             "label": "test without coverage",
             "type": "shell",
+            "problemMatcher": [],
             "command": "python3 -m pytest -v *.py"
         },
         {
             "label": "lint",
             "type": "shell",
+            "problemMatcher": [],
             "command": "python3 -m  pylint `ls -R|grep .py$|xargs`"
         },
         {
             "label": "test with coverage",
             "type": "shell",
+            "problemMatcher": [],
             "command": "python3 -m coverage run --source=. -m pytest -v *.py && python3 -m coverage report --fail-under 100 -m"
         },
     ]
