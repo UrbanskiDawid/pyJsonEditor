@@ -1,32 +1,37 @@
 """parse token list to recursive JsonNodes"""
 from typing import List
-import pytest
-
+from tokenizer import tokenize,StringIO
 class TokenError(Exception):
     """ parser exception"""
 
 class JsonNode:
-    def __init__(self,start,end, type):
+    """ json node with begin end end children"""
+    def __init__(self,start,end, obj_type):
         self.start= start
         self.end  = end
-        self.type = type
+        self.type = obj_type
         self.kids = []
         self.name = ''
 
     def append(self,obj):
+        """add one child"""
         self.kids.append( obj )
 
     def __repr__(self):
         return self.to_string()
 
     def to_string(self,depth=0):
+        """this object as string"""
         prefix=' '*(2*depth)
         if self.type=='value':
             return f'JsonNode::{self.type}[{self.start}..{self.end}] = {self.kids[0]}'
 
         return f'JsonNode::{self.type}[{self.start}..{self.end}] ' +\
                f'\n{prefix}{{\n' +\
-               ',\n'.join([ ' '*(2*(depth+1))+str(i)+( '="'+child.name+'"' if child.name else '' )+": "+child.to_string(depth+1) for i,child in enumerate(self.kids)]) +\
+               ',\n'.join([ ' '*(2*(depth+1))+
+                             str(i)+
+                             ( '="'+child.name+'"' if child.name else '' )+
+                             ": "+child.to_string(depth+1) for i,child in enumerate(self.kids)]) +\
                f'\n{prefix}}}'
 
     def __eq__(self, obj):
@@ -87,8 +92,8 @@ def eat_dict(tok:TokenList):
 
     while tok.peek():
         if tok.next_is('S'):
-            st = eat_string(tok)
-            ret.append(st)
+            child = eat_string(tok)
+            ret.append(child)
         elif tok.next_is(','):
             tok.pop()
         elif tok.next_is('}'):
@@ -166,7 +171,7 @@ def parse(tokens:List):
 
 ############################## TESTS ##############################
 def test_tokenize():
-    from tokenizer import tokenize,StringIO
+    """ test returned struct"""
     json_str="""{ 'a':1, "b": 123 }"""
     tokens = list(tokenize(StringIO(json_str)))
     ret = parse(tokens)
@@ -191,6 +196,6 @@ def test_tokenize():
 
 
     expected = JsonNode(0,19,'dict')
-    expected.kids=[kid00, kid10] 
-    
+    expected.kids=[kid00, kid10]
+
     assert expected == ret
