@@ -56,6 +56,7 @@ def eat_dict(tok:TokenList):
         elif tok.next_is(','):
             tok.pop()
         elif tok.next_is('}'):
+            tok.pop()
             return ret
         else:
             tok.raise_token_error('object error, unexpectd token: {}'.format(tok.peek()))
@@ -150,6 +151,25 @@ testdata = [
 (
     [('{', 0), ('S', 1, 'a'), (':', 4), ('{', 5), ('}', 6), ('}', 7)],
     {"a":{}}
+),
+(
+    [('{', 0),
+      ('S', 1, 'a'), (':', 4),
+       ('[', 5),
+          ('[', 6), (']', 7),
+        (']', 8),
+     ('}', 9)],
+    {"a":[[]]}
+)
+,
+(
+    [('{', 0),
+      ('S', 1, 'a'), (':', 2),
+       ('[', 3),
+          ('{', 4), ('}', 5),
+        (']', 6),
+     ('}', 7)],
+    {"a":[{}]}
 )
 ]
 
