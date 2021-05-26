@@ -1,15 +1,22 @@
 """parse token list to object"""
 from typing import List
 import pytest
+
+class TokenError(Exception):
+    pass
+
 class TokenList:
     """helper class to iterate tokens"""
     def __init__(self, tok):
         self.tok = tok.copy()
-        self.pos =0
+        self.pos = 0
+
+    def raiseTokenError(self,comment:str):
+        raise TokenError(f'TokenError at postion:{self.pos} {comment}')
 
     def pop(self):
         """remove first token"""
-        self.pos+=1
+        self.pos += 1
         return self.tok[self.pos-1]
 
     def peek(self):
@@ -20,16 +27,26 @@ class TokenList:
         """check type on firts token"""
         return self.peek()[0]== tok_type if self.pos<len(self.tok) else False
 
+    def expect(self, tok_type, comment=''):
+        """assert next token"""
+        next_tok = self.peek()
+        if not next_tok: #todo empty token?
+            self.raiseTokenError(f'expected: {tok_type} found: Nothing. {comment}')
+        if next_tok[0] != tok_type:
+            self.raiseTokenError(f'expected: {tok_type} found: {next_tok[0]}. {comment}')
+
+
 def eat_value(tok: TokenList):
     """convert value tokens to object"""
-    assert tok.next_is('v')
+    tok.expect('v')
     ret = tok.pop()
     return ret[2]
+
 
 def eat_dict(tok:TokenList):
     """convert dict tokens to object"""
     ret={}
-    assert tok.next_is('{'), 'not object'
+    tok.expect('{', 'not object')
     tok.pop()
     while tok.peek():
         if tok.next_is('S'):
@@ -40,12 +57,14 @@ def eat_dict(tok:TokenList):
         elif tok.next_is('}'):
             return ret
         else:
-            raise Exception('array error',tok.peek())
+            tok.raiseTokenError('object error, unexpectd token: {}'.format(tok.peek()))
+    tok.raiseTokenError('object not closed')
+
 
 def eat_array(tok:TokenList):
     """convert array tokens to object"""
     ret=[]
-    assert tok.next_is('['), 'not array'
+    tok.expect('[', 'not array')
     tok.pop()
     while tok.peek():
         val=None
@@ -62,23 +81,34 @@ def eat_array(tok:TokenList):
             tok.pop()
             return ret
         else:
-            raise Exception('array error',tok.peek())
+            tok.raiseTokenError('array error, unexpectd token: {}'.format(tok.peek()))
         ret.append(val)
+    tok.raiseTokenError('array not closed')
 
-def eat_string(tokens: TokenList):
+
+def eat_string(tok: TokenList):
     """convert string tokens to object"""
-    assert tokens.next_is('S'), 'string is not string'
-    key=tokens.pop()[2]
-    assert tokens.next_is(':'), 'string is not string'
-    tokens.pop()
-    if tokens.next_is('v'):
-        val=eat_value(tokens)
-    elif tokens.next_is('['):
-        val=eat_array(tokens)
-    elif tokens.next_is('{'):
-        val=eat_dict(tokens)
+    tok.expect('S', 'not a string')
+    
+    key = tok.pop()
+    if len(key) != 3:
+        tok.raiseTokenError('string token is missing value')
+    key = key[2]
+
+    tok.expect(':', 'not string')
+    tok.pop()
+
+    if tok.next_is('v'):
+        val=eat_value(tok)
+    elif tok.next_is('['):
+        val=eat_array(tok)
+    elif tok.next_is('{'):
+        val=eat_dict(tok)
     else:
-        raise Exception('string error',tokens.peek())
+        tok_next=tok.peek()
+        if not tok_next:
+            tok.raiseTokenError('string error unexpected end')    
+        tok.raiseTokenError(f'string error unexpectd token: {tok_next[0]}')
     return (key,val)
 
 
@@ -88,9 +118,6 @@ def parse(tokens:List):
     """
     tok=TokenList(tokens)
     return eat_dict(tok)
-
-
-
 
 
 #################################### TESTS ###################################
@@ -128,3 +155,50 @@ testdata = [
 def test_tokenize(tokens, expected):
     """test tokenize method"""
     assert parse(tokens) == expected
+
+testdata_erros=[
+    (
+        [('{',1),('X')],
+        'TokenError at postion:1 object error, unexpectd token: X'
+    ),
+    (
+        [('{',1)],
+        'TokenError at postion:1 object not closed'
+    )
+    ,
+    (
+        [('{',1), ('S',2) ],
+         'TokenError at postion:2 string token is missing value'
+    )
+    ,
+    (
+        [('{',1), ('S',2,'') ],
+        'TokenError at postion:2 expected: : found: Nothing. not string'
+    )
+    ,
+    (
+        [('{',1), ('S',2,''),('X',3) ],
+        'TokenError at postion:2 expected: : found: X. not string'
+    )
+    ,
+    (
+        [('{',1), ('S',2,''),(':',3) ],
+        'TokenError at postion:3 string error unexpected end'
+    )
+    ,
+    (
+        [('{',1), ('S',2,''),(':',3),('X',4) ],
+        "TokenError at postion:3 string error unexpectd token: X"
+    )
+    ,
+    (
+        [('{',1), ('S',2,''),(':',3),('v',4,'') ],
+        'TokenError at postion:4 object not closed'
+    )
+]
+
+@pytest.mark.parametrize("tokens,expected_error", testdata_erros)
+def test_exceptions(tokens, expected_error):
+    """test tokenize method"""
+    with pytest.raises(TokenError, match=expected_error):
+        parse(tokens)
