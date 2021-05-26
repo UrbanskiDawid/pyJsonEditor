@@ -7,15 +7,19 @@ from tokenizer import tokenize
 from parse import parse
 
 
-JSON_RAW="""{
-    "test1":  true  ,
-    "arr":[1,2],
-    "test2": { "name":1 }
-}"""
+def string_to_dict(json_str: str):
+    """ build object from string"""
+    handle = StringIO(json_str)
+    tokens = list(tokenize(handle))
+    return parse(tokens)
 
 
-if __name__ == '__main__':
-    f = StringIO(JSON_RAW)
-    a = list(tokenize(f))
-    ret = parse(a)
-    pprint(ret)
+def test_string_to_dict():
+    JSON_RAW="""{
+        "test1":  true  ,
+        "arr":[1,2],
+        "test2": { "name":1 }
+    }"""
+
+    ret = string_to_dict(JSON_RAW)
+    assert ret == {"test1": 'true', "arr":['1','2'], "test2": {"name":"1"}}
