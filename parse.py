@@ -82,7 +82,8 @@ def eat_array(tok:TokenList):
             tok.pop()
             return ret
         else:
-            tok.raise_token_error('array error, unexpectd token: {}'.format(tok.peek()))
+            tok_next=tok.peek()
+            tok.raise_token_error('array error, unexpectd token: {}'.format(tok_next[0]))
         ret.append(val)
     tok.raise_token_error('array not closed')
 
@@ -92,7 +93,7 @@ def eat_string(tok: TokenList):
     tok.expect('S', 'not a string')
 
     key = tok.pop()
-    if len(key) != 3:
+    if len(key) != 3 or not key[2]:
         tok.raise_token_error('string token is missing value')
     key = key[2]
 
@@ -174,27 +175,47 @@ testdata_erros=[
     ,
     (
         [('{',1), ('S',2,'') ],
+         'TokenError at postion:2 string token is missing value'
+    )
+    ,
+    (
+        [('{',1), ('S',2,'s') ],
         'TokenError at postion:2 expected: : found: Nothing. not string'
     )
     ,
     (
-        [('{',1), ('S',2,''),('X',3) ],
+        [('{',1), ('S',2,'s'),('X',3) ],
         'TokenError at postion:2 expected: : found: X. not string'
     )
     ,
     (
-        [('{',1), ('S',2,''),(':',3) ],
+        [('{',1), ('S',2,'s'),(':',3) ],
         'TokenError at postion:3 string error unexpected end'
     )
     ,
     (
-        [('{',1), ('S',2,''),(':',3),('X',4) ],
+        [('{',1), ('S',2,'s'),(':',3),('X',4) ],
         "TokenError at postion:3 string error unexpectd token: X"
     )
     ,
     (
-        [('{',1), ('S',2,''),(':',3),('v',4,'') ],
+        [('{',1), ('S',2,'s'),(':',3),('v',4,'') ],
         'TokenError at postion:4 object not closed'
+    )
+    ,
+    (
+        [('{',1), ('S',2,'s'),(':',3),('[',4) ],
+        'TokenError at postion:4 array not closed'
+    )
+    ,
+    (
+        [('{',1), ('S',2,'s'),(':',3),('[',4) ],
+        'TokenError at postion:4 array not closed'
+    )
+    ,
+    (
+        [('{',1), ('S',2,'s'),(':',3),('[',4),('X',5) ],
+        'TokenError at postion:4 array error, unexpectd token: X'
     )
 ]
 
