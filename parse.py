@@ -3,7 +3,7 @@ from typing import List
 import pytest
 
 class TokenError(Exception):
-    pass
+    """ parser exception"""
 
 class TokenList:
     """helper class to iterate tokens"""
@@ -11,7 +11,8 @@ class TokenList:
         self.tok = tok.copy()
         self.pos = 0
 
-    def raiseTokenError(self,comment:str):
+    def raise_token_error(self,comment:str):
+        """ raport exceptions """
         raise TokenError(f'TokenError at postion:{self.pos} {comment}')
 
     def pop(self):
@@ -30,10 +31,10 @@ class TokenList:
     def expect(self, tok_type, comment=''):
         """assert next token"""
         next_tok = self.peek()
-        if not next_tok: #todo empty token?
-            self.raiseTokenError(f'expected: {tok_type} found: Nothing. {comment}')
+        if not next_tok:
+            self.raise_token_error(f'expected: {tok_type} found: Nothing. {comment}')
         if next_tok[0] != tok_type:
-            self.raiseTokenError(f'expected: {tok_type} found: {next_tok[0]}. {comment}')
+            self.raise_token_error(f'expected: {tok_type} found: {next_tok[0]}. {comment}')
 
 
 def eat_value(tok: TokenList):
@@ -57,8 +58,8 @@ def eat_dict(tok:TokenList):
         elif tok.next_is('}'):
             return ret
         else:
-            tok.raiseTokenError('object error, unexpectd token: {}'.format(tok.peek()))
-    tok.raiseTokenError('object not closed')
+            tok.raise_token_error('object error, unexpectd token: {}'.format(tok.peek()))
+    tok.raise_token_error('object not closed')
 
 
 def eat_array(tok:TokenList):
@@ -81,18 +82,18 @@ def eat_array(tok:TokenList):
             tok.pop()
             return ret
         else:
-            tok.raiseTokenError('array error, unexpectd token: {}'.format(tok.peek()))
+            tok.raise_token_error('array error, unexpectd token: {}'.format(tok.peek()))
         ret.append(val)
-    tok.raiseTokenError('array not closed')
+    tok.raise_token_error('array not closed')
 
 
 def eat_string(tok: TokenList):
     """convert string tokens to object"""
     tok.expect('S', 'not a string')
-    
+
     key = tok.pop()
     if len(key) != 3:
-        tok.raiseTokenError('string token is missing value')
+        tok.raise_token_error('string token is missing value')
     key = key[2]
 
     tok.expect(':', 'not string')
@@ -107,8 +108,8 @@ def eat_string(tok: TokenList):
     else:
         tok_next=tok.peek()
         if not tok_next:
-            tok.raiseTokenError('string error unexpected end')    
-        tok.raiseTokenError(f'string error unexpectd token: {tok_next[0]}')
+            tok.raise_token_error('string error unexpected end')
+        tok.raise_token_error(f'string error unexpectd token: {tok_next[0]}')
     return (key,val)
 
 
