@@ -33,3 +33,11 @@ class TokenList:
             self.raise_token_error(f'expected: {tok_type} found: Nothing. {comment}')
         if next_tok[0] != tok_type:
             self.raise_token_error(f'expected: {tok_type} found: {next_tok[0]}. {comment}')
+
+        return self.pop()
+
+    def expect_pop(self, tok_type, comment):
+        """pop next item throw if unexpected token type"""
+        if not self.peek()[0]==tok_type:
+            raise TokenError(f'TokenError at postion:{self.pos} {comment}')
+        return self.pop()

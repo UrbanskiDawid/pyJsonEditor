@@ -1,16 +1,17 @@
 """parse token list to recursive JsonNodes"""
 from typing import List
-from tokenizer import tokenize,StringIO
+import pytest
 from token_list import TokenList
-
 class JsonNode:
     """ json node with begin end end children"""
-    def __init__(self,start,end, obj_type):
-        self.start= start
-        self.end  = end
+    def __init__(self, obj_type, **kwargs):
         self.type = obj_type
-        self.kids = []
-        self.name = ''
+        self.start = kwargs['start']
+        self.end = kwargs['end']
+        self.name = kwargs.get('name','')
+        self.kids = kwargs.get('kids',[])
+        if 'value' in kwargs:
+            self.kids = [kwargs['value']]
 
     def append(self,obj):
         """add one child"""
@@ -42,128 +43,175 @@ class JsonNode:
                 obj.name == self.name
 
 
-def eat_value(tok: TokenList):
-    """convert value tokens to object"""
-    tok.expect('v')
-    begin = tok.pop()
-    ret = JsonNode(begin[1],False,'value')
-    ret.append(begin[2])
-    ret.end = begin[1] + len(begin[2])
+def eat_value(tok: TokenList) -> JsonNode:
+    """
+    convert value tokens to object
+    V -> JsonNode
+    """
+    begin = tok.expect_pop('v', 'not a value')
+    ret = JsonNode('value',
+                   start=begin[1],
+                   end=(begin[1] + len(begin[2])))
+    ret.append(begin[2]) #payload as first child
     return ret
 
+def eat_child(tok: TokenList) -> JsonNode:
+    """
+    (V|A|D)
+    """
+    ret = None
+    if   tok.next_is('v'):
+        ret = eat_value(tok)
+    elif tok.next_is('['):
+        ret = eat_array(tok)
+    elif tok.next_is('{'):
+        ret = eat_dict(tok)
+    return ret
 
-def eat_dict(tok:TokenList):
-    """convert dict tokens to object"""
-    tok.expect('{', 'not object')
-    begin = tok.pop()
-    ret = JsonNode(begin[1],False, 'dict')
+def eat_dict(tok:TokenList) -> JsonNode:
+    """
+    convert dict tokens to object,
+    basicalyy array with named items
+    '{' 'S':(V|A|D)* '}'
+    """
+    begin = tok.expect_pop('{', 'not object')
+    ret = JsonNode('dict',
+                   start=begin[1],
+                   end=False)
 
     while tok.peek():
+
         if tok.next_is('S'):
-            child = eat_string(tok)
+
+            name = tok.pop()
+            if len(name) != 3 or not name[2]:
+                tok.raise_token_error('string koken is missing value')
+            tok.expect_pop(':', 'not string')
+            child = eat_child(tok)
+            if not child:
+                tok.raise_token_error('missing child')
+            child.name = name[2]
             ret.append(child)
-        elif tok.next_is(','):
-            tok.pop()
-        elif tok.next_is('}'):
-            ret.end = tok.pop()[1]+1
-            return ret
-        else:
-            tok.raise_token_error('object error, unexpectd token: {}'.format(tok.peek()))
+
+            if tok.next_is(','):
+                tok.pop()
+                continue
+
+        end = tok.expect_pop('}', 'object error, unexpectd token: {}'.format( str(tok.peek()) ))
+        ret.end = end[1]
+        return ret
+
     tok.raise_token_error('object not closed')
 
 
-def eat_array(tok:TokenList):
-    """convert array tokens to object"""
-    tok.expect('[', 'not array')
-    begin = tok.pop()
-    ret = JsonNode(begin[1],False,'array')
+def eat_array(tok:TokenList) -> JsonNode:
+    """
+    convert array tokens to object
+    '[' ( V|A|D )* ']'
+    """
+    begin = tok.expect_pop('[', 'not array')
+
+    ret = JsonNode('array',
+                   start=begin[1],
+                   end=False)
     while tok.peek():
-        val=None
-        if tok.next_is('v'):
-            val=eat_value(tok)
-        elif tok.next_is('['):
-            val=eat_array(tok)
-        elif tok.next_is('{'):
-            val=eat_dict(tok)
-        elif tok.next_is(','):
-            tok.pop()
-            continue
-        elif tok.next_is(']'):
-            ret.end = tok.pop()[1]
-            return ret
-        else:
-            tok_next=tok.peek()
-            tok.raise_token_error('array error, unexpectd token: {}'.format(tok_next[0]))
-        ret.append(val)
-    tok.raise_token_error('array not closed')
 
+        child = eat_child(tok)
+        if child:
+            ret.append(child)
+            if tok.next_is(','):
+                tok.pop()
+                continue
 
-def eat_string(tok: TokenList):
-    """convert string tokens to object"""
-    tok.expect('S', 'not a string')
-    key = tok.pop()
+        end = tok.expect_pop(']', 'array error unexpectd token: {}'.format( str(tok.peek()) ))
+        ret.end = end[1]
+        return ret
 
-    ret = JsonNode(key[1],False,'string')
-    ret.name=key[2]
+    tok.raise_token_error('array error, object not closed')
 
-    if len(key) != 3 or not key[2]:
-        tok.raise_token_error('string token is missing value')
-    key = key[2]
-
-    tok.expect(':', 'not string')
-    tok.pop()
-
-    if tok.next_is('v'):
-        val=eat_value(tok)
-    elif tok.next_is('['):
-        val=eat_array(tok)
-    elif tok.next_is('{'):
-        val=eat_dict(tok)
-    else:
-        tok_next=tok.peek()
-        if not tok_next:
-            tok.raise_token_error('string error unexpected end')
-        tok.raise_token_error(f'string error unexpectd token: {tok_next[0]}')
-    ret.append(val)
-    ret.end = tok.peek()[1]
-    return ret
-
-
-def parse(tokens:List):
+def parse(tokens:List) -> JsonNode:
     """
     Conver tokens into object (dict)
     """
-    tok=TokenList(tokens)
+    tok = TokenList(tokens)
     return eat_dict(tok)
 
 
 ############################## TESTS ##############################
-def test_tokenize():
-    """ test returned struct"""
-    json_str="""{ 'a':1, "b": 123 }"""
-    tokens = list(tokenize(StringIO(json_str)))
+
+def test_json_node_to_string():
+    """ JsonNode tests """
+    ret = str(JsonNode('dict', start=0,end=19,))
+    assert ret == 'JsonNode::dict[0..19] \n{\n\n}'
+
+    ret = JsonNode('value', start=1,end=2)
+    ret.kids=['ok']
+    assert str(ret) == 'JsonNode::value[1..2] = ok'
+
+
+testdata = [
+(   #'{"a":1}'
+    [('{', 0), ('}', 1)],
+    JsonNode('dict', start=0, end=1)
+)
+,
+(   #'{"b":1}'
+    [('{', 0), ('S', 1, 'b'), (':', 4), ('v', 5, '1'), ('}', 6)],
+    JsonNode('dict',
+       start=0,
+       end=6,
+       kids=[
+           JsonNode('value', start=5,end=6, name='b', value='1')
+       ])
+)
+,
+(   #'{"c":[]}
+    [('{', 0), ('S', 1, 'c'), (':', 4), ('[', 5), (']', 6), ('}', 7)],
+    JsonNode('dict',
+       start=0,
+       end=7,
+       kids=[
+           JsonNode('array', start=5,end=6, name='c')
+       ])
+)
+,
+(   #'{"d":{}}
+    [('{', 0), ('S', 1, 'd'), (':', 4), ('[', 5), (']', 6), ('}', 7)],
+    JsonNode('dict',
+       start=0,
+       end=7,
+       kids=[
+           JsonNode('array', start=5,end=6, name='d')
+       ])
+)
+,
+(
+    #{"e":{"f":1}}
+    [('{', 0),
+      ('S', 1, 'e'), (':', 4),
+         ('{', 5),
+             ('S', 6, 'f'), (':', 9), ('v', 10, '1'),
+         ('}', 11),
+      ('}', 12)],
+    JsonNode('dict',
+        start=0,
+        end=12,
+        kids=[
+            JsonNode('dict',
+             start=5,
+             end=11,
+             name='e',
+             kids=[
+                 JsonNode('value',start=10,end=11, name='f', value='1')
+             ]
+            )
+        ]
+    )
+)
+]
+
+@pytest.mark.parametrize("tokens,expected", testdata)
+def test_parse(tokens, expected):
+    """ throw all expceptions """
     ret = parse(tokens)
-
-    ##
-    kid01 = JsonNode(6,7,'value')
-    kid01.kids=['1']
-
-    kid00 = JsonNode(2,7,'string')
-    kid00.name = 'a'
-    kid00.kids=[kid01]
-    ###
-
-    ##
-    kid11 = JsonNode(13,18,'value')
-    kid11.kids=[' 123 ']
-
-    kid10 = JsonNode(9,18,'string')
-    kid10.name = 'b'
-    kid10.kids=[kid11]
-    ###
-
-
-    expected = JsonNode(0,19,'dict')
-    expected.kids=[kid00, kid10]
-
-    assert expected == ret
+    assert ret == expected
