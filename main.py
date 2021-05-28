@@ -3,17 +3,22 @@
 
 from io import StringIO
 from typing import List
+import os
+import click
 from tokenizer import tokenize
 from tree import parse as tree_parse
 from tree import JsonNode
 from matcher import print_matched
-import click
-import os
 
-def __to_handle(json):
+def __get_tokens(json) -> List:
+    tokens=[]
     if os.path.isfile(json):
-        return open(json)
-    return StringIO(json)
+        with open(json) as handle:
+            tokens = list(tokenize(handle))
+    else:
+        with StringIO(json) as handle:
+            tokens = list(tokenize(handle))
+    return tokens
 
 @click.command()
 @click.option('--json_str', help='file or string with json.')
@@ -21,9 +26,7 @@ def string_to_tokens(json_str: str) -> List:
     """
     python3 -c 'from main import *; print( string_to_tokens("{}") );'
     """
-    handle = __to_handle(json_str)
-    tokens = list(tokenize(handle))
-    return tokens
+    return __get_tokens(json_str)
 
 @click.command()
 @click.option('--json_str', help='file or string with json.')
@@ -31,8 +34,7 @@ def string_to_tree(json_str: str) -> JsonNode:
     """
     python3 -c 'from main import *; r=string_to_tree("{}"); print(r)'
     """
-    handle = __to_handle(json_str)
-    tokens = list(tokenize(handle))
+    tokens = __get_tokens(json_str)
     return tree_parse(tokens)
 
 @click.command()
@@ -42,17 +44,16 @@ def string_to_tree(json_str: str) -> JsonNode:
 @click.option('--color', default=False, is_flag=True, help='enable color output')
 def string_match_mark(json, pattern, symbol, color):
     """mark part of matched json"""
-    handle = __to_handle(json)
-    tokens = list(tokenize(handle))
+    tokens = __get_tokens(json)
     node = tree_parse(tokens)
-    for c in print_matched(json, node, pattern, symbol, color):
-         print(c,end='')
+    for ret in print_matched(json, node, pattern, symbol, color):
+        print(ret, end='')
     print('')
 
 
-
 if __name__ == '__main__':
-    string_match_mark()
+    main = click.command()(string_match_mark)
+    main()
 
 def test_string_to_tokens():
     """test string_to_tokens"""
