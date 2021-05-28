@@ -4,7 +4,7 @@
 from io import StringIO
 from typing import List
 import os
-#import click
+import tempfile
 from tokenizer import tokenize
 from tree import parse as tree_parse
 from tree import JsonNode
@@ -20,16 +20,18 @@ def __get_tokens(json) -> List:
             tokens = list(tokenize(handle))
     return tokens
 
-# @click.command()
-# @click.option('--json_str', help='file or string with json.')
+def test_get_tokens__file():
+    """test __get_tokens for files"""
+    with tempfile.NamedTemporaryFile() as temp:
+        __get_tokens(temp.name)
+
+
 def string_to_tokens(json_str: str) -> List:
     """
     python3 -c 'from main import *; print( string_to_tokens("{}") );'
     """
     return __get_tokens(json_str)
 
-# @click.command()
-# @click.option('--json_str', help='file or string with json.')
 def string_to_tree(json_str: str) -> JsonNode:
     """
     python3 -c 'from main import *; r=string_to_tree("{}"); print(r)'
@@ -37,23 +39,11 @@ def string_to_tree(json_str: str) -> JsonNode:
     tokens = __get_tokens(json_str)
     return tree_parse(tokens)
 
-# @click.command()
-# @click.argument('json')
-# @click.argument('pattern')
-# @click.option('--symbol', default='X', help='')
-# @click.option('--color', default=False, is_flag=True, help='enable color output')
-def string_match_mark(json, pattern, symbol, color):
+def string_match_mark(json, pattern, symbol='X', color=None):
     """mark part of matched json"""
     tokens = __get_tokens(json)
     node = tree_parse(tokens)
-    for ret in print_matched(json, node, pattern, symbol, color):
-        print(ret, end='')
-    print('')
-
-
-# if __name__ == '__main__':
-#     main = click.command()(string_match_mark)
-#     main()
+    return print_matched(json, node, pattern, symbol, color)
 
 def test_string_to_tokens():
     """test string_to_tokens"""
@@ -66,3 +56,9 @@ def test_string_to_tree():
     json = "{}"
     ret = string_to_tree(json)
     assert ret == JsonNode('dict', start=0, end=2)
+
+def test_string_match_mark():
+    """ minimal string_match_mark test """
+    json = "{}"
+    ret = string_match_mark(json, "", symbol='X')
+    assert ret == "XX"
