@@ -19,5 +19,5 @@ jobs:
         pip install -r requirements.txt
     - name: Run tests with coverage
       run: |
-        python -m coverage run --source=. -m pytest -vv *.py
+        python -m coverage run --source=. -m pytest -vv
         python -m coverage report --fail-under 100 -m

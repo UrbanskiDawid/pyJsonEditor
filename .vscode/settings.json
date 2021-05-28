@@ -1,12 +1,8 @@
 {
-    "python.testing.pytestArgs": [
-        "-v",
-        "main.py",
-        "tokenizer.py",
-        "parse.py",
-        "tokens.py"
-    ],
+    "python.testing.pytestArgs": ["-vv"],
     "python.testing.unittestEnabled": false,
     "python.testing.nosetestsEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "testing.autoRun.mode": "all",
+    "testing.autoRun.delay": 1
 }
