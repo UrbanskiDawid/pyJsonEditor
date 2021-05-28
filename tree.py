@@ -98,7 +98,7 @@ def eat_dict(tok:TokenList) -> JsonNode:
                 continue
 
         end = tok.expect_pop('}', 'object error, unexpectd token: {}'.format( str(tok.peek()) ))
-        ret.end = end[1]
+        ret.end = end[1]+1
         return ret
 
     tok.raise_token_error('object not closed')
@@ -124,7 +124,7 @@ def eat_array(tok:TokenList) -> JsonNode:
                 continue
 
         end = tok.expect_pop(']', 'array error unexpectd token: {}'.format( str(tok.peek()) ))
-        ret.end = end[1]
+        ret.end = end[1]+1
         return ret
 
     tok.raise_token_error('array error, object not closed')
