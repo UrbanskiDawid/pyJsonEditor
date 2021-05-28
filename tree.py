@@ -152,14 +152,14 @@ def test_json_node_to_string():
 testdata = [
 (   #{}
     [('{', 0), ('}', 1)],
-    JsonNode('dict', start=0, end=1)
+    JsonNode('dict', start=0, end=2)
 )
 ,
 (   #{"b":1}
     [('{', 0), ('S', 1, 'b'), (':', 4), ('v', 5, '1'), ('}', 6)],
     JsonNode('dict',
        start=0,
-       end=6,
+       end=7,
        kids=[
            JsonNode('value', start=5,end=6, name='b', value='1')
        ])
@@ -173,7 +173,7 @@ testdata = [
      ('}', 15)],
     JsonNode('dict',
        start=0,
-       end=14,
+       end=15,
        kids=[
            JsonNode('value', start=6,end=7, name='b1', value='3'),
            JsonNode('value', start=13,end=14, name='b2', value='4')
@@ -184,9 +184,9 @@ testdata = [
     [('{', 0), ('S', 1, 'c'), (':', 4), ('[', 5), (']', 6), ('}', 7)],
     JsonNode('dict',
        start=0,
-       end=7,
+       end=8,
        kids=[
-           JsonNode('array', start=5,end=6, name='c')
+           JsonNode('array', start=5,end=7, name='c')
        ])
 )
 ,
@@ -199,22 +199,23 @@ testdata = [
            ('v', 9, '3'),
         (']', 10),
      ('}', 11)],
-    JsonNode('dict',start=0,end=11,
-             kids=[JsonNode('array',start=6,end=10,name='c1',
+    JsonNode('dict',start=0,end=12,
+             kids=[JsonNode('array',start=6,end=11,name='c1',
                             kids=[
                                 JsonNode('value',start=7,end=8, value='2'),
                                 JsonNode('value',start=9,end=10,value='3')
                             ])
                    ]
-            ))
+            )
+)
 ,
 (   #{"d":{}}
     [('{', 0), ('S', 1, 'd'), (':', 4), ('[', 5), (']', 6), ('}', 7)],
     JsonNode('dict',
        start=0,
-       end=7,
+       end=8,
        kids=[
-           JsonNode('array', start=5,end=6, name='d')
+           JsonNode('array', start=5,end=7, name='d')
        ])
 )
 ,
@@ -228,11 +229,11 @@ testdata = [
       ('}', 12)],
     JsonNode('dict',
         start=0,
-        end=12,
+        end=13,
         kids=[
             JsonNode('dict',
              start=5,
-             end=11,
+             end=12,
              name='e',
              kids=[
                  JsonNode('value',start=10,end=11, name='f', value='1')
