@@ -19,7 +19,7 @@
             "label": "test with coverage",
             "type": "shell",
             "problemMatcher": [],
-            "command": "python3 -m coverage run --source=. -m pytest -v *.py && python3 -m coverage report --fail-under 100 -m"
+            "command": "python3 -m coverage run --source=. -m pytest -vv *.py && python3 -m coverage report --fail-under 100 -m"
         },
     ]
 }

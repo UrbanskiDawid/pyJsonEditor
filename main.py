@@ -29,9 +29,8 @@ def test_string_to_tokens():
     """test string_to_tokens"""
     json = "{}"
     ret = string_to_tokens(json)
-    expect = [('{', 0), ('}', 1)]
-    assert type(ret) == type(expect) 
- 
+    assert ret == [('{', 0), ('}', 1)]
+
 def test_string_to_tree():
     """test string_to_tree"""
     json = "{}"

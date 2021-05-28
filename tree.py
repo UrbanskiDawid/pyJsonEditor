@@ -1,7 +1,7 @@
 """parse token list to recursive JsonNodes"""
 from typing import List
 import pytest
-from token_list import TokenList
+from token_list import TokenList,TokenError
 class JsonNode:
     """ json node with begin end end children"""
     def __init__(self, obj_type, **kwargs):
@@ -85,8 +85,8 @@ def eat_dict(tok:TokenList) -> JsonNode:
 
             name = tok.pop()
             if len(name) != 3 or not name[2]:
-                tok.raise_token_error('string koken is missing value')
-            tok.expect_pop(':', 'not string')
+                tok.raise_token_error('string token is missing value')
+            tok.expect_pop(':', 'missing ":"')
             child = eat_child(tok)
             if not child:
                 tok.raise_token_error('missing child')
@@ -150,12 +150,12 @@ def test_json_node_to_string():
 
 
 testdata = [
-(   #'{"a":1}'
+(   #{}
     [('{', 0), ('}', 1)],
     JsonNode('dict', start=0, end=1)
 )
 ,
-(   #'{"b":1}'
+(   #{"b":1}
     [('{', 0), ('S', 1, 'b'), (':', 4), ('v', 5, '1'), ('}', 6)],
     JsonNode('dict',
        start=0,
@@ -165,7 +165,22 @@ testdata = [
        ])
 )
 ,
-(   #'{"c":[]}
+(   #{"b1":3,"b2":4}
+    [('{', 0),
+       ('S', 1, 'b1'), (':', 5), ('v', 6, '3'),
+        (',', 7),
+       ('S', 8, 'b2'), (':', 12), ('v', 13, '4'), ('}', 14),
+     ('}', 15)],
+    JsonNode('dict',
+       start=0,
+       end=14,
+       kids=[
+           JsonNode('value', start=6,end=7, name='b1', value='3'),
+           JsonNode('value', start=13,end=14, name='b2', value='4')
+       ])
+)
+,
+(   #{"c":[]}
     [('{', 0), ('S', 1, 'c'), (':', 4), ('[', 5), (']', 6), ('}', 7)],
     JsonNode('dict',
        start=0,
@@ -175,7 +190,25 @@ testdata = [
        ])
 )
 ,
-(   #'{"d":{}}
+(   #{"c1":[2,3]}
+    [('{', 0),
+     ('S', 1, 'c1'), (':', 5),
+        ('[', 6),
+           ('v', 7, '2'),
+           (',', 8),
+           ('v', 9, '3'),
+        (']', 10),
+     ('}', 11)],
+    JsonNode('dict',start=0,end=11,
+             kids=[JsonNode('array',start=6,end=10,name='c1',
+                            kids=[
+                                JsonNode('value',start=7,end=8, value='2'),
+                                JsonNode('value',start=9,end=10,value='3')
+                            ])
+                   ]
+            ))
+,
+(   #{"d":{}}
     [('{', 0), ('S', 1, 'd'), (':', 4), ('[', 5), (']', 6), ('}', 7)],
     JsonNode('dict',
        start=0,
@@ -212,6 +245,34 @@ testdata = [
 
 @pytest.mark.parametrize("tokens,expected", testdata)
 def test_parse(tokens, expected):
-    """ throw all expceptions """
+    """ sunny day scenarios """
     ret = parse(tokens)
     assert ret == expected
+
+
+testdata_exceptions=[
+(
+    [('x',0)],'TokenError at postion:0 not object'
+),
+(
+    [('{',0)], 'TokenError at postion:1 object not closed'
+),
+(
+    [('{',0),('S',1)], 'TokenError at postion:2 string token is missing value'
+),
+(
+    [('{',0),('S',1,'s')],'TokenError at postion:2 missing ":"'
+),
+(
+    [('{',0),('S',1,'s'),(':',2)],'TokenError at postion:3 missing child'
+),
+(
+    [('{',0),('S',1,'s'),(':',2),('[',3)], 'TokenError at postion:4 array error, object not closed'
+),
+]
+
+@pytest.mark.parametrize("tokens,expected", testdata_exceptions)
+def test_parse_exception(tokens, expected):
+    """ exceptions tests """
+    with pytest.raises(TokenError, match=expected):
+        parse(tokens)
