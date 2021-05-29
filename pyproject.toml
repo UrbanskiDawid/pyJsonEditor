@@ -9,6 +9,7 @@ description = 'Edit parts of json strings & files while keeping the orginal, inc
 license = "MIT"
 authors = ["Dawid Urbanski <kontakt@dawidurbanski.pl>"]
 repository = "https://github.com/UrbanskiDawid/pyJsonEditor"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = '^3.6'
