@@ -23,7 +23,7 @@ testdata = [
     # {'password':'value'}
     [('{', 0), ('S', 1, 'password'), (':', 11), ('S', 12, 'aaa'), ('}', 17)],
     JsonNode('dict',start=0,end=18,kids= [
-        JsonNode('value',start=12,end=15,name="password", value="aaa")
+        JsonNode('value',start=12,end=17,name="password", value="aaa")
     ])
 )
 ,

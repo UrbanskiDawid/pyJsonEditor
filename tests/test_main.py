@@ -31,3 +31,11 @@ def test_string_match_mark():
     json = "{}"
     ret = string_match_mark(json, "", symbol='X')
     assert ret == "XX"
+
+def test_password_masking():
+    """test example usage"""
+    ret = string_match_mark('{"pass":"#RFDS"}','pass')
+    assert ret == '{"pass":XXXXXXX}'
+
+    ret = string_match_mark("""{"pass":  '#RFDS'  }""",'pass')
+    assert ret == '{"pass":  XXXXXXX  }'

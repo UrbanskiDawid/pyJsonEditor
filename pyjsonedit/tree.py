@@ -43,18 +43,27 @@ class JsonNode:
                 obj.name == self.name
 
 
-def eat_value(tok: TokenList, token_type='v') -> JsonNode:
+def eat_value(tok: TokenList) -> JsonNode:
     """
     convert value tokens to object
     V -> JsonNode
     """
-    begin = tok.expect_pop(token_type, 'not a value')
-    ret = JsonNode('value',
-                   start=begin[1],
-                   end=(begin[1] + len(begin[2])))
-    ret.append(begin[2]) #payload as first child
-    return ret
+    begin = tok.expect_pop('v', 'not a value')
+    return JsonNode('value',
+                    start= begin[1],
+                    end  =(begin[1] + len(begin[2])),
+                    value= begin[2])
 
+def eat_string(tok: TokenList) -> JsonNode:
+    """
+    convert stirng tokens to object
+    V -> JsonNode
+    """
+    begin = tok.expect_pop('S', 'not a string')
+    return JsonNode('value',
+                    start = begin[1],
+                    end   =(begin[1] + len(begin[2]) + 2),
+                    value = begin[2])
 
 def eat_child(tok: TokenList) -> JsonNode:
     """
@@ -68,7 +77,7 @@ def eat_child(tok: TokenList) -> JsonNode:
     elif tok.next_is('{'):
         ret = eat_dict(tok)
     elif tok.next_is('S'):
-        ret = eat_value(tok,'S')
+        ret = eat_string(tok)
     return ret
 
 def eat_dict(tok:TokenList) -> JsonNode:
