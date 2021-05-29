@@ -44,10 +44,13 @@ def _match_node(node:JsonNode, patterns, depth=0):
 
         # raw
         if node.type == 'dict':
+            found=False
             for k in node.kids:
                 if pattern in ['*', k.name]:
+                    found=True
                     yield from _match_node( k, patterns, depth+1)
-                    return
+            if found:
+                return
 
         raise MatchException(f'pattern "{pattern}" not found')
     except MatchException as fail:
