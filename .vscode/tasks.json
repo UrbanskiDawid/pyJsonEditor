@@ -25,7 +25,7 @@
             "label": "build package",
             "type": "shell",
             "problemMatcher": [],
-            "command": "python3 -m build --out dist/ && python3 -m twine check dist/"
+            "command": "python3 -m build --out dist/ && python3 -m twine check dist/*"
         }
     ]
 }
