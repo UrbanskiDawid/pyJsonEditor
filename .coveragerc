@@ -1,0 +1,13 @@
+[run]
+include= 
+    pyjsonedit/*py
+
+omit = 
+    pyjsonedit/cli.py
+
+[paths]
+source =
+    pyjsonedit
+
+[report]
+fail_under = 100

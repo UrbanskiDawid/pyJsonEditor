@@ -19,4 +19,4 @@ pytest = '6.2.4'
 coverage = '5.5'
 
 [tool.poetry.scripts]
-pyjsonedit = "pyjsonedit.cli:main"
+pyjsonedit = "pyjsonedit.cli:run"

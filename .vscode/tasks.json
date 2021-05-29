@@ -4,22 +4,22 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "test without coverage",
-            "type": "shell",
-            "problemMatcher": [],
-            "command": "python3 -m pytest"
-        },
-        {
             "label": "lint",
             "type": "shell",
             "problemMatcher": [],
             "command": "python3 -m pylint --rcfile=pylintrc `find -regextype egrep -regex '(.*.py)$'`"
         },
         {
+            "label": "test without coverage",
+            "type": "shell",
+            "problemMatcher": [],
+            "command": "python3 -m pytest"
+        },
+        {
             "label": "test with coverage",
             "type": "shell",
             "problemMatcher": [],
-            "command": "python3 -m coverage run --source=. -m pytest && python3 -m coverage report --fail-under 100 -m"
+            "command": "python3 -m coverage run -m pytest && python3 -m coverage report --rcfile=.coveragerc"
         },
         {
             "label": "package build",

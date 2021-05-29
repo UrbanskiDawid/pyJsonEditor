@@ -1,5 +1,6 @@
 """parse token list to recursive JsonNodes"""
 import pytest
+
 from pyjsonedit.tree import JsonNode, parse
 from pyjsonedit.token_list import TokenError
 

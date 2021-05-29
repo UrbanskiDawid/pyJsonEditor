@@ -2,7 +2,7 @@
 """main file to see execution"""
 
 import tempfile
-from pyjsonedit.main import string_to_tokens, string_to_tree,string_match_mark
+from pyjsonedit.main import string_to_tokens, string_to_tree,string_match_mark,cli_match_mark
 from pyjsonedit.tree import JsonNode
 
 def test_get_tokens__file():
@@ -39,3 +39,21 @@ def test_password_masking():
 
     ret = string_match_mark("""{"pass":  '#RFDS'  }""",'pass')
     assert ret == '{"pass":  XXXXXXX  }'
+
+def test_cli_match_mark():
+    """test cli_match_mark"""
+    ret=[]
+    def test_print_mock(val):
+        ret.append(val)
+
+    with tempfile.NamedTemporaryFile() as temp:
+        temp.write(b'{}')
+        temp.seek(0)
+
+        cli_match_mark("",
+                       temp.name,
+                       symbol="X",
+                       color=False,
+                       callback=test_print_mock)
+
+    assert ret == ['XX']

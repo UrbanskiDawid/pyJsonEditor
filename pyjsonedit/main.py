@@ -37,3 +37,18 @@ def string_match_mark(json, pattern, symbol='X', color=None):
     tokens = __get_tokens(json)
     node = tree_parse(tokens)
     return print_matched(json, node, pattern, symbol, color)
+
+def cli_match_mark(pattern, json, symbol, color, callback=print):
+    """cli method for masking matching parts of json"""
+
+    tokens = []
+    if os.path.isfile(json):
+        with open(json) as handle:
+            json = handle.read()
+
+    with StringIO(json) as handle:
+        tokens = list(tokenize(handle))
+
+        node = tree_parse(tokens)
+        ret = print_matched(json, node, pattern, symbol, color)
+        callback(ret)

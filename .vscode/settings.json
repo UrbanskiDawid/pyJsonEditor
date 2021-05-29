@@ -1,8 +1,10 @@
 {
-    "python.testing.pytestArgs": ["-vv"],
+    "testing.autoRun.mode": "all",
+    "testing.autoRun.delay": 1,
+
+    "python.linting.pylintEnabled": true,  
+    "python.testing.pytestArgs": [ "." ],
     "python.testing.unittestEnabled": false,
     "python.testing.nosetestsEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "testing.autoRun.mode": "all",
-    "testing.autoRun.delay": 1
+    "python.testing.pytestEnabled": true
 }
