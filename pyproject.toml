@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = 'pyJsonEdit'
-version = 'v0.0.10'
+version = ''
 description = 'Edit parts of json strings & files while keeping the orginal, inconsistent formating'
 license = "MIT"
 authors = ["Dawid Urbanski <kontakt@dawidurbanski.pl>"]
