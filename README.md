@@ -2,7 +2,7 @@
 
 [![PyPI version pyjsonedit](https://badge.fury.io/py/ansicolortags.svg)](https://pypi.org/project/pyjsonedit/)
 [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)]()
-[![tests]](https://github.com/UrbanskiDawid/pyJsonEditor/actions/workflows/tests.yaml/badge.svg)
+[![tests](https://github.com/UrbanskiDawid/pyJsonEditor/actions/workflows/tests.yaml/badge.svg)]()
 
 [![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/powered-by-coffee.svg)](https://forthebadge.com)
