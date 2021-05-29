@@ -4,11 +4,10 @@
 from io import StringIO
 from typing import List
 import os
-import tempfile
-from tokenizer import tokenize
-from tree import parse as tree_parse
-from tree import JsonNode
-from matcher import print_matched
+from pyjsonedit.tokenizer import tokenize
+from pyjsonedit.tree import parse as tree_parse
+from pyjsonedit.tree import JsonNode
+from pyjsonedit.matcher import print_matched
 
 def __get_tokens(json) -> List:
     tokens=[]
@@ -19,12 +18,6 @@ def __get_tokens(json) -> List:
         with StringIO(json) as handle:
             tokens = list(tokenize(handle))
     return tokens
-
-def test_get_tokens__file():
-    """test __get_tokens for files"""
-    with tempfile.NamedTemporaryFile() as temp:
-        __get_tokens(temp.name)
-
 
 def string_to_tokens(json_str: str) -> List:
     """
@@ -44,21 +37,3 @@ def string_match_mark(json, pattern, symbol='X', color=None):
     tokens = __get_tokens(json)
     node = tree_parse(tokens)
     return print_matched(json, node, pattern, symbol, color)
-
-def test_string_to_tokens():
-    """test string_to_tokens"""
-    json = "{}"
-    ret = string_to_tokens(json)
-    assert ret == [('{', 0), ('}', 1)]
-
-def test_string_to_tree():
-    """test string_to_tree"""
-    json = "{}"
-    ret = string_to_tree(json)
-    assert ret == JsonNode('dict', start=0, end=2)
-
-def test_string_match_mark():
-    """ minimal string_match_mark test """
-    json = "{}"
-    ret = string_match_mark(json, "", symbol='X')
-    assert ret == "XX"
