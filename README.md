@@ -1,6 +1,8 @@
 # pyJsonEdit
 
-Edit parts of inconsistently formatted json
+Edit parts of inconsistently formatted json.
+
+It's just a bit slower that doint this by hand!
 
 ## how to install
 
@@ -9,14 +11,64 @@ Edit parts of inconsistently formatted json
 
 # json in python
 
-pure pyhon implementation of json encoder/decoder
+**Pure pyhon** implementation of json encoder/decoder.
+
+Its slow and unnecessary!
 # matcher
 
-now you can select nodes in json tree
+Now you can select **nodes** in json tree
 
+syntax!
+
+  *  | select all children in current node
+-----|-----
+ [n] | select n-th item of curent node
+ {n} | select n-th item of curent node
+ key | select node chilld by name 
+"key"| select node chilld by name
+ \>  | go to next node
+
+## example: mask multiple nodes
+> $ ./pyjsonedit/print_color **"quiz > * > q1 >*"** DOC/example.json
+
+```
+{
+    "quiz": {
+        "sport": {
+            "q1": {
+                "question": XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX,
+                "options": XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX,
+                "answer": XXXXXXXXXXXXXXX
+            }
+        },
+        "maths": {
+            "q1": {
+                "question": XXXXXXXXXXX,
+                "options": XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX,
+                "answer": XXXX
+            },
+            "q2": {
+                "question": "12 - 8 = ?",
+                "options": [
+                    "1",
+                    "2",
+                    "3",
+                    "4"
+                ],
+                "answer": "4"
+            }
+        }
+    }
+}
+```
 
 ## example: mask selected nodes
 
-Add this ![ Alt text](DOC/mask_pass.gif) / ! []()
+```bash
+$ import pyjsonedit
+$ pyjsonedit.string_match_mark("{'pass':123}","pass")
+{'pass':XXX}
+```
+![](DOC/mask_pass.gif) / ! []()
 
 
