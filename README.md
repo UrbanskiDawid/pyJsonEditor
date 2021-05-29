@@ -1,8 +1,17 @@
-# pyJsonEdit
+# pyJsonEdit 
+
+[![PyPI version pyjsonedit](https://badge.fury.io/py/ansicolortags.svg)](https://pypi.org/project/pyjsonedit/)
+[![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)]()
+[![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/powered-by-coffee.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/uses-badges.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/works-on-my-machine.svg)](https://forthebadge.com)
+![tests](https://github.com/UrbanskiDawid/pyJsonEditor/actions/workflows/tests.yaml/badge.svg)
 
 Edit parts of inconsistently formatted json.
 
 It's just a bit slower that doint this by hand!
+
 
 ## how to install
 
@@ -69,6 +78,6 @@ $ import pyjsonedit
 $ pyjsonedit.string_match_mark("{'pass':123}","pass")
 {'pass':XXX}
 ```
-![](DOC/mask_pass.gif) / ! []()
+![](DOC/mask_pass.gif)[]()
 
 
