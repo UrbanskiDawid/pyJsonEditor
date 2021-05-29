@@ -149,4 +149,3 @@ def test_parse_exception(tokens, expected):
     """ exceptions tests """
     with pytest.raises(TokenError, match=expected):
         parse(tokens)
-

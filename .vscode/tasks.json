@@ -13,7 +13,7 @@
             "label": "lint",
             "type": "shell",
             "problemMatcher": [],
-            "command": "python3 -m pylint --fail-under=10 `find -regextype egrep -regex '(.*.py)$'`"
+            "command": "python3 -m pylint --rcfile=pylintrc `find -regextype egrep -regex '(.*.py)$'`"
         },
         {
             "label": "test with coverage",
