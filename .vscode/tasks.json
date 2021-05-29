@@ -7,19 +7,25 @@
             "label": "test without coverage",
             "type": "shell",
             "problemMatcher": [],
-            "command": "python3 -m pytest -v *.py"
+            "command": "python3 -m pytest"
         },
         {
             "label": "lint",
             "type": "shell",
             "problemMatcher": [],
-            "command": "python3 -m  pylint `ls -R|grep .py$|xargs`"
+            "command": "python3 -m pylint --fail-under=10 `find -regextype egrep -regex '(.*.py)$'`"
         },
         {
             "label": "test with coverage",
             "type": "shell",
             "problemMatcher": [],
-            "command": "python3 -m coverage run --source=. -m pytest -vv *.py && python3 -m coverage report --fail-under 100 -m"
+            "command": "python3 -m coverage run --source=. -m pytest && python3 -m coverage report --fail-under 100 -m"
         },
+        {
+            "label": "build package",
+            "type": "shell",
+            "problemMatcher": [],
+            "command": "python3 -m build --out dist/"
+        }
     ]
 }
