@@ -43,21 +43,22 @@ class JsonNode:
                 obj.name == self.name
 
 
-def eat_value(tok: TokenList) -> JsonNode:
+def eat_value(tok: TokenList, token_type='v') -> JsonNode:
     """
     convert value tokens to object
     V -> JsonNode
     """
-    begin = tok.expect_pop('v', 'not a value')
+    begin = tok.expect_pop(token_type, 'not a value')
     ret = JsonNode('value',
                    start=begin[1],
                    end=(begin[1] + len(begin[2])))
     ret.append(begin[2]) #payload as first child
     return ret
 
+
 def eat_child(tok: TokenList) -> JsonNode:
     """
-    (V|A|D)
+    (S|V|A|D)
     """
     ret = None
     if   tok.next_is('v'):
@@ -66,6 +67,8 @@ def eat_child(tok: TokenList) -> JsonNode:
         ret = eat_array(tok)
     elif tok.next_is('{'):
         ret = eat_dict(tok)
+    elif tok.next_is('S'):
+        ret = eat_value(tok,'S')
     return ret
 
 def eat_dict(tok:TokenList) -> JsonNode:
@@ -107,7 +110,7 @@ def eat_dict(tok:TokenList) -> JsonNode:
 def eat_array(tok:TokenList) -> JsonNode:
     """
     convert array tokens to object
-    '[' ( V|A|D )* ']'
+    '[' ( S|V|A|D )* ']'
     """
     begin = tok.expect_pop('[', 'not array')
 

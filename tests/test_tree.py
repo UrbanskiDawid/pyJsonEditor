@@ -19,6 +19,14 @@ testdata = [
     JsonNode('dict', start=0, end=2)
 )
 ,
+(
+    # {'password':'value'}
+    [('{', 0), ('S', 1, 'password'), (':', 11), ('S', 12, 'aaa'), ('}', 17)],
+    JsonNode('dict',start=0,end=18,kids= [
+        JsonNode('value',start=12,end=15,name="password", value="aaa")
+    ])
+)
+,
 (   #{"b":1}
     [('{', 0), ('S', 1, 'b'), (':', 4), ('v', 5, '1'), ('}', 6)],
     JsonNode('dict',
@@ -141,3 +149,4 @@ def test_parse_exception(tokens, expected):
     """ exceptions tests """
     with pytest.raises(TokenError, match=expected):
         parse(tokens)
+
