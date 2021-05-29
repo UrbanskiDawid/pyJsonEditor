@@ -26,6 +26,6 @@ def print_color(pattern, json, symbol, color):
         ret = print_matched(json, node, pattern, symbol, color)
         print(ret)
 
-if __name__ == '__main__':
+def main():
     main = click.command()(print_color)
     main()

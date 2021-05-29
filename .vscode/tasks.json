@@ -22,10 +22,22 @@
             "command": "python3 -m coverage run --source=. -m pytest && python3 -m coverage report --fail-under 100 -m"
         },
         {
-            "label": "build package",
+            "label": "package build",
             "type": "shell",
             "problemMatcher": [],
             "command": "python3 -m build --out dist/ && python3 -m twine check dist/*"
-        }
+        },
+        {
+            "label": "package install",
+            "type": "shell",
+            "problemMatcher": [],
+            "command": "pip3 install dist/pyJsonEdit-*.whl"
+        },
+        {
+            "label": "package uninstall",
+            "type": "shell",
+            "problemMatcher": [],
+            "command": "pip3 uninstall pyJsonEdit"
+        },
     ]
 }
