@@ -39,5 +39,11 @@
             "problemMatcher": [],
             "command": "pip3 uninstall pyJsonEdit"
         },
+        {
+            "label": "generate code stats",
+            "type": "shell",
+            "problemMatcher": [],
+            "command": "python3 scripts/code_stats.py"
+        },
     ]
 }
