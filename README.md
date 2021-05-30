@@ -7,7 +7,6 @@
 [![](https://forthebadge.com/images/badges/made-with-python.svg)]()
 [![](https://forthebadge.com/images/badges/powered-by-coffee.svg)]()
 [![](https://forthebadge.com/images/badges/uses-badges.svg)]()
-[![](https://forthebadge.com/images/badges/works-on-my-machine.svg)]()
 
 
 Edit parts of inconsistently formatted json.
