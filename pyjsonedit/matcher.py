@@ -18,7 +18,7 @@ def _each_child_by_index(node:JsonNode, node_type:str, child_idx):
     return node.kids[child_idx]
 
 def _match_node(node:JsonNode, patterns, depth=0):
-
+    """[generator]"""
     try:
         if depth >= len(patterns) or not patterns[depth].strip():
             yield node
@@ -57,12 +57,12 @@ def _match_node(node:JsonNode, patterns, depth=0):
         yield fail
 
 def match(root: JsonNode, pattern: str):
-    """ start node matching"""
+    """ [generator] start node matching"""
     patterns = pattern.strip().split('>')
     yield from _match_node(root, patterns)
 
-def print_matched(json_str, node:JsonNode, pattern:str, mark_symbol='X', color=False):
-    """generates marked characters matching given 'pattern'"""
+def match_as_string(json_str, node:JsonNode, pattern:str, mark_symbol='X', color=False):
+    """retuns marked characters matching given 'pattern'"""
 
     found = []
     for i in match(node, pattern):

@@ -88,11 +88,11 @@ def test_print_matched__exception():
     expected='pattern "WUT" not found'
 
     with pytest.raises(matcher.MatchException, match=expected):
-        matcher.print_matched('{}', node, pattern)
+        matcher.match_as_string('{}', node, pattern)
 
 def test_print_matched__color():
     """ exceptions tests """
     node = JsonNode('dict', start=0, end=2, kids=[ ])
     pattern  = ''
-    ret = matcher.print_matched('{}', node, pattern, color=True)
+    ret = matcher.match_as_string('{}', node, pattern, color=True)
     assert ret == '\x1b[91mX\x1b[0m\x1b[91mX\x1b[0m'

@@ -7,7 +7,7 @@ import os
 from pyjsonedit.tokenizer import tokenize
 from pyjsonedit.tree import parse as tree_parse
 from pyjsonedit.tree import JsonNode
-from pyjsonedit.matcher import print_matched
+from pyjsonedit.matcher import match_as_string
 
 def __get_tokens(json) -> List:
     tokens=[]
@@ -36,7 +36,7 @@ def string_match_mark(json, pattern, symbol='X', color=None):
     """mark part of matched json"""
     tokens = __get_tokens(json)
     node = tree_parse(tokens)
-    return print_matched(json, node, pattern, symbol, color)
+    return match_as_string(json, node, pattern, symbol, color)
 
 def cli_match_mark(pattern, json, symbol, color, callback=print):
     """cli method for masking matching parts of json"""
@@ -50,5 +50,5 @@ def cli_match_mark(pattern, json, symbol, color, callback=print):
         tokens = list(tokenize(handle))
 
         node = tree_parse(tokens)
-        ret = print_matched(json, node, pattern, symbol, color)
+        ret = match_as_string(json, node, pattern, symbol, color)
         callback(ret)
