@@ -126,4 +126,4 @@ $ pyjsonedit.string_match_mark("{'pass':123}","pass")
 
 ## project stats
 
-[![string_match_mark](DOC/stats_boilerplate.png)]()
+[![string_match_mark](https://github.com/UrbanskiDawid/pyJsonEditor/blob/master/DOC/stats_boilerplate.png)]()
