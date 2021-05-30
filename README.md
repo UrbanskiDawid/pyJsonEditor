@@ -1,6 +1,6 @@
 # pyJsonEdit
 
-[![PyPi version](https://pypip.in/v/jsoneditor/badge.png)](https://crate.io/packages/jsoneditor/)
+[![PyPi version](https://badge.fury.io/py/pyjsonedit.svg)](https://pypi.org/project/pyjsonedit/)
 [![license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)]()
 [![tests](https://github.com/UrbanskiDawid/pyJsonEditor/actions/workflows/tests.yaml/badge.svg)](https://github.com/UrbanskiDawid/pyJsonEditor/actions/workflows/tests.yaml)
 
