@@ -120,4 +120,5 @@ $ import pyjsonedit
 $ pyjsonedit.string_match_mark("{'pass':123}","pass")
 {'pass':XXX}
 ```
-![](DOC/mask_pass.gif)[]()
+
+[![string_match_mark](https://github.com/UrbanskiDawid/pyJsonEditor/raw/master/DOC/mask_pass.gif)]()
