@@ -37,4 +37,4 @@ ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
         shadow=True, startangle=0)
 ax1.axis('equal')
 ax1.set_title('my code vs boilerplate in this project')
-plt.savefig(OUT_FN, transparent=True)
+plt.savefig(OUT_FN, transparent=False)
