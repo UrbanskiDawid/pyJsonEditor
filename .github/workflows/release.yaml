@@ -13,5 +13,5 @@ jobs:
     - uses: actions/checkout@v1
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "pyjsonedit/*"
+        artifacts: "requirements.txt,pyjsonedit/*"
         token: ${{ secrets.GITHUB_TOKEN }}
