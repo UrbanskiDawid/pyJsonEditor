@@ -10,39 +10,78 @@
 [![](https://forthebadge.com/images/badges/works-on-my-machine.svg)]()
 
 
-
-
 Edit parts of inconsistently formatted json.
 
 It's just a bit slower that doint this by hand!
 
+# matcher
+
+Now you can easly select **nodes** in json tree
+
+syntax:
+
+selector | action | node type
+---------|--------|-------
+  *| select **all** items in current node| -
+ [n] | select **n-th** item of curent node| array
+ {n} | select **n-th** item of curent node| object
+ key | select node chilld **by name**| object
+"key"| select node chilld **by name**| object
+ \>  | mark current node as seleced |-
+
+
+example 1: 
+
+```
+key > [0]
+```
+
+this pattern will match one element by:
+
+1. selecting "key" element in root node (assuring that is an object)
+2. select first element in it (assumintg its and array) 
+
+example 2: 
+
+```
+name > *
+```
+
+this pattern will match multiple elements by:
+
+1. selecting "name" element in root node (assuring that is an object)
+2. select all element in it 
 
 ## how to install
 
-> pip install --upgrade pyjsonedit
+```bash
+pip install --upgrade pyjsonedit
+```
 
+## python module
 
-# json in python
+```python
+$ import pyjsonedit
+```
+## comand line
 
-**Pure pyhon** implementation of json encoder/decoder.
+```sh
+ $ pyjsonedit --help
+```
 
-Its slow and unnecessary!
-# matcher
+```bash
+Usage: pyjsonedit [OPTIONS] PATTERN JSON
 
-Now you can select **nodes** in json tree
+  cli method for masking matching parts of json
 
-syntax!
-
-  *  | select all children in current node
------|-----
- [n] | select n-th item of curent node
- {n} | select n-th item of curent node
- key | select node chilld by name 
-"key"| select node chilld by name
- \>  | go to next node
+Options:
+  --symbol TEXT
+  --color        enable color output
+  --help         Show this message and exit.
+```
 
 ## example: mask multiple nodes
-> $ ./pyjsonedit/print_color **"quiz > * > q1 >*"** DOC/example.json
+> $ pyjsonedit **"quiz > * > q1 >*"** DOC/example.json
 
 ```
 {
@@ -77,11 +116,9 @@ syntax!
 
 ## example: mask selected nodes
 
-```bash
+```python
 $ import pyjsonedit
 $ pyjsonedit.string_match_mark("{'pass':123}","pass")
 {'pass':XXX}
 ```
 ![](DOC/mask_pass.gif)[]()
-
-
