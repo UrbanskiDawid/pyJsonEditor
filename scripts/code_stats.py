@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """ generete fun stats for this project """
 
 import os
