@@ -13,6 +13,19 @@ def cli_match_mark(pattern, jsons, symbol, color):
     for json in jsons:
         main.cli_match_mark(pattern, json, symbol, color)
 
-def run():
+def run_mark():
     """this method is used by package installer"""
     click.command()(cli_match_mark)()
+
+
+@click.argument('pattern')
+@click.argument('template')
+@click.argument('jsons', nargs=-1)
+def cli_modify(pattern, template, jsons):
+    """cli method for masking matching parts of json"""
+    for json in jsons:
+        main.cli_modify(pattern, template, json)
+
+def run_modify():
+    """this method is used by package installer"""
+    click.command()(cli_modify)()

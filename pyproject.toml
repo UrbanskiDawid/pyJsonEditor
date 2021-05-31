@@ -19,4 +19,5 @@ pytest = '6.2.4'
 coverage = '5.5'
 
 [tool.poetry.scripts]
-pyjsonedit = "pyjsonedit.cli:run"
+pyjsonedit-mark = "pyjsonedit.cli:run_mark"
+pyjsonedit-modify = "pyjsonedit.cli:run_modify"

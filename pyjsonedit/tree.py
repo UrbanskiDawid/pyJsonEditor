@@ -43,6 +43,7 @@ class JsonNode:
                 obj.name == self.name
 
 
+
 def eat_value(tok: TokenList) -> JsonNode:
     """
     convert value tokens to object

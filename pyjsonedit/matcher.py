@@ -19,7 +19,7 @@ def _each_child_by_index(node:JsonNode, node_type:str, child_idx):
 
 def _has_child_with_value(node:JsonNode, name, value) -> bool:
     for k in node.kids:
-        if name == k.name and k.type=='value' and k.kids[0] == value:                    
+        if name == k.name and k.type=='value' and k.kids[0] == value:
             return True
     return False
 
@@ -63,7 +63,7 @@ def _match_node(node:JsonNode, patterns, depth=0):
                     yield from _match_node( k, patterns, depth+1)
             if found:
                 return
-        
+
         # match if dict
         if node.type == 'dict' and '=' in pattern:
             pattern = pattern.split('=')
