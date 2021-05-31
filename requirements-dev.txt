@@ -1,0 +1,4 @@
+pylint==2.8.2
+pytest==6.2.4
+coverage==5.5
+click==7.1.2
