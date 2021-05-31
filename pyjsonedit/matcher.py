@@ -26,6 +26,12 @@ def _match_node(node:JsonNode, patterns, depth=0):
 
         pattern = patterns[depth].strip()
 
+        # match all
+        if pattern == '*':
+            for k in node.kids:
+                yield from _match_node( k, patterns, depth+1)
+            return
+
         # array by index
         array_index = re.match(r'\[(\d+)\]',pattern)
         if array_index:
@@ -46,7 +52,7 @@ def _match_node(node:JsonNode, patterns, depth=0):
         if node.type == 'dict':
             found=False
             for k in node.kids:
-                if pattern in ['*', k.name]:
+                if pattern in k.name:
                     found=True
                     yield from _match_node( k, patterns, depth+1)
             if found:

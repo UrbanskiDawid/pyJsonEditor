@@ -96,3 +96,13 @@ def test_print_matched__color():
     pattern  = ''
     ret = matcher.match_as_string('{}', node, pattern, color=True)
     assert ret == '\x1b[91mX\x1b[0m\x1b[91mX\x1b[0m'
+
+
+def test_match_all_in_array():
+    """ ask array with one element for element #99 """
+    kid1 = JsonNode('value',start=1,end=2)
+    kid2 = JsonNode('value',start=4,end=5)
+    node = JsonNode('array', start=0, end=2, kids=[ kid1, kid2 ])
+    pattern = '*'
+    ret=list(matcher.match(node, pattern))
+    assert ret == [kid1,kid2]
