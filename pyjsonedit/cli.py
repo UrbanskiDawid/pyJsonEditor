@@ -5,12 +5,13 @@ import click
 from pyjsonedit import main
 
 @click.argument('pattern')
-@click.argument('json')
+@click.argument('jsons', nargs=-1)
 @click.option('--symbol', default='X', help='')
 @click.option('--color', default=True, is_flag=True, help='enable color output')
-def cli_match_mark(pattern, json, symbol, color):
+def cli_match_mark(pattern, jsons, symbol, color):
     """cli method for masking matching parts of json"""
-    main.cli_match_mark(pattern, json, symbol, color)
+    for json in jsons:
+        main.cli_match_mark(pattern, json, symbol, color)
 
 def run():
     """this method is used by package installer"""
