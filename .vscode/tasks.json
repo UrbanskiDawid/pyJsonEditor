@@ -37,7 +37,7 @@
             "label": "package uninstall",
             "type": "shell",
             "problemMatcher": [],
-            "command": "pip3 uninstall pyJsonEdit"
+            "command": "yes|pip3 uninstall pyJsonEdit"
         },
         {
             "label": "generate code stats",
