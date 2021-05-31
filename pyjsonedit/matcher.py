@@ -17,6 +17,12 @@ def _each_child_by_index(node:JsonNode, node_type:str, child_idx):
         raise MatchException(f'not enough kids {child_idx}')
     return node.kids[child_idx]
 
+def _has_child_with_value(node:JsonNode, name, value) -> bool:
+    for k in node.kids:
+        if name == k.name and k.type=='value' and k.kids[0] == value:                    
+            return True
+    return False
+
 def _match_node(node:JsonNode, patterns, depth=0):
     """[generator]"""
     try:
@@ -52,11 +58,20 @@ def _match_node(node:JsonNode, patterns, depth=0):
         if node.type == 'dict':
             found=False
             for k in node.kids:
-                if pattern in k.name:
+                if pattern == k.name:
                     found=True
                     yield from _match_node( k, patterns, depth+1)
             if found:
                 return
+        
+        # match if dict
+        if node.type == 'dict' and '=' in pattern:
+            pattern = pattern.split('=')
+            assert len(pattern)==2, "malformed equal operation"
+            child_name,child_value = pattern
+            if _has_child_with_value(node, child_name.strip(), child_value.strip()):
+                yield from _match_node(node, patterns, depth+1)
+            return
 
         raise MatchException(f'pattern "{pattern}" not found')
     except MatchException as fail:

@@ -27,6 +27,7 @@ selector | action | node type
  key | select node chilld **by name**| object
 "key"| select node chilld **by name**| object
  \>  | mark current node as seleced |-
+ a=b | check if current node has child 'a' with value 'b' |object
 
 
 example 1: 

@@ -106,3 +106,15 @@ def test_match_all_in_array():
     pattern = '*'
     ret=list(matcher.match(node, pattern))
     assert ret == [kid1,kid2]
+
+def test_match_by_child_value():
+    """ ask array with one element for element #99 """
+    kid1 = JsonNode('value',start=4,end=5, value='val', name='key')
+    node = JsonNode('dict', start=0, end=2, kids=[ kid1 ])
+    pattern = 'key=val'
+    ret=list(matcher.match(node, pattern))
+    assert ret == [node]
+
+    pattern2 = 'key=val2'
+    ret=list(matcher.match(node, pattern2))
+    assert ret == []
