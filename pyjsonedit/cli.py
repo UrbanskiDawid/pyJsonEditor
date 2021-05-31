@@ -8,14 +8,14 @@ from pyjsonedit import main
 @click.argument('jsons', nargs=-1)
 @click.option('--symbol', default='X', help='')
 @click.option('--color', default=True, is_flag=True, help='enable color output')
-def cli_match_mark(pattern, jsons, symbol, color):
+def cli_match_mask(pattern, jsons, symbol, color):
     """cli method for masking matching parts of json"""
     for json in jsons:
-        main.cli_match_mark(pattern, json, symbol, color)
+        main.cli_match_mask(pattern, json, symbol, color)
 
-def run_mark():
+def run_mask():
     """this method is used by package installer"""
-    click.command()(cli_match_mark)()
+    click.command()(cli_match_mask)()
 
 
 @click.argument('pattern')

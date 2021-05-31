@@ -63,14 +63,14 @@ pip install --upgrade pyjsonedit
 ```python
 $ import pyjsonedit
 ```
-## comand line
+## comand line - mark
 
 ```sh
- $ pyjsonedit --help
+ $ pyjsonedit-mask --help
 ```
 
-```bash
-Usage: pyjsonedit [OPTIONS] PATTERN JSON
+``` bash
+Usage: pyjsonedit-mash [OPTIONS] PATTERN [JSONS]...
 
   cli method for masking matching parts of json
 
@@ -80,8 +80,30 @@ Options:
   --help         Show this message and exit.
 ```
 
+example:
+```
+pyjsonedit-mask "pass" "{'pass':123}"
+{'pass':XXX}
+```
+## comand line - modify
+
+```bash
+Usage: pyjsonedit-modify [OPTIONS] PATTERN TEMPLATE [JSONS]...
+
+  cli method for masking matching parts of json
+
+Options:
+  --help  Show this message and exit.
+```
+
+example:
+```
+pyjsonedit-modify "pass" 'P@$W&$d' "{'pass':123}"
+{'pass':P@$W&$d}
+```
+
 ## example: mask multiple nodes
-> $ pyjsonedit **"quiz > * > q1 >*"** DOC/example.json
+> $ pyjsonedit-mask **"quiz > * > q1 >*"** DOC/example.json
 
 ```
 {

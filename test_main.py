@@ -5,7 +5,7 @@ import tempfile
 from io import StringIO
 import pytest
 from pyjsonedit.main import string_to_tokens, string_to_tree,string_match_mark
-from pyjsonedit.main import cli_match_mark,modify_matched_nodes_with_callback,cli_modify
+from pyjsonedit.main import cli_match_mask,modify_matched_nodes_with_callback,cli_modify
 from pyjsonedit.tree import JsonNode
 from pyjsonedit.matcher import MatchException
 
@@ -54,7 +54,7 @@ def test_cli_match_mark():
         temp.write(b'{}')
         temp.seek(0)
 
-        cli_match_mark("",
+        cli_match_mask("",
                        temp.name,
                        symbol="X",
                        color=False,

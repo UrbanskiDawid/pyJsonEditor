@@ -40,7 +40,7 @@ def string_match_mark(json, pattern, symbol='X', color=None):
     node = tree_parse(tokens)
     return match_as_string(json, node, pattern, symbol, color)
 
-def cli_match_mark(pattern, json, symbol, color, callback=print):
+def cli_match_mask(pattern, json, symbol, color, callback=print):
     """cli method for masking matching parts of json"""
 
     tokens = []
