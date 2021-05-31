@@ -96,7 +96,8 @@ Usage: pyjsonedit-modify [OPTIONS] PATTERN TEMPLATE [JSONS]...
   cli method for masking matching parts of json
 
 Options:
-  --help  Show this message and exit.
+  --insert  don't print save to file
+  --help    Show this message and exit.
 ```
 
 example:

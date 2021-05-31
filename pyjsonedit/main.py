@@ -79,10 +79,12 @@ def modify_matched_nodes_with_callback(
     write_with_modifications(input_reader, modifications, output_writer)
 
 
-def cli_modify(pattern:str, template:str, json_input):
+def cli_modify(pattern:str, template:str, insert:bool, json_input):
     """
     interface to access 'modify_matched_nodes_with_callback'
     with both file and sting as input
+
+    insert - if true save chanes to file, else print
     """
     if os.path.isfile(json_input):
         with tempfile.TemporaryFile(mode="w+") as json_writer:
@@ -91,8 +93,12 @@ def cli_modify(pattern:str, template:str, json_input):
                                                    json_reader, json_writer,
                                                    lambda _: template)
             json_writer.seek(0)
-            with open(json_input, 'w') as out:
-                out.write(json_writer.read())
+            if insert:
+                with open(json_input, 'w') as out:
+                    out.write(json_writer.read())
+            else:
+                ret = json_writer.read()
+                print(ret)
             return json_input
     else:
         with StringIO() as json_writer:

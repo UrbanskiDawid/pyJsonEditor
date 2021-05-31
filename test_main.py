@@ -97,14 +97,25 @@ def test_main_cli_modify__file():
     with tempfile.NamedTemporaryFile() as temp:
         temp.write(b'{"a":0}')
         temp.seek(0)
-        cli_modify('*', 'TEST', temp.name)
+        cli_modify('*', 'TEST', True, temp.name)
 
         temp.seek(0)
         out=temp.read()
         assert out == b'{"a":TEST}'
 
+def test_main_cli_modify__file_no_insert():
+    """ cli_modify with files """
+    with tempfile.NamedTemporaryFile() as temp:
+        temp.write(b'{"a":0}')
+        temp.seek(0)
+        cli_modify('*', 'TEST', False, temp.name)
+
+        temp.seek(0)
+        out=temp.read()
+        assert out == b'{"a":0}'
+
 def test_main_cli_modify__strings():
     """ cli_modify with strings """
     temp='{"a":0}'
-    ret = cli_modify('*', 'TEST', temp)
+    ret = cli_modify('*', 'TEST', False, temp)
     assert ret == '{"a":TEST}'

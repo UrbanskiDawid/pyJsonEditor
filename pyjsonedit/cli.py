@@ -20,11 +20,12 @@ def run_mask():
 
 @click.argument('pattern')
 @click.argument('template')
+@click.option('-i','--insert', default=False, is_flag=True, help="don't print save to file")
 @click.argument('jsons', nargs=-1)
-def cli_modify(pattern, template, jsons):
+def cli_modify(pattern, template, insert, jsons):
     """cli method for masking matching parts of json"""
     for json in jsons:
-        main.cli_modify(pattern, template, json)
+        main.cli_modify(pattern, template, insert, json)
 
 def run_modify():
     """this method is used by package installer"""
