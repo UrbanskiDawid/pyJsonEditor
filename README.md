@@ -11,7 +11,7 @@
 
 Edit parts of inconsistently formatted json.
 
-It's just a bit slower that doint this by hand!
+It's just a bit slower that doing this by hand!
 
 # matcher
 
@@ -26,7 +26,7 @@ selector | action | node type
  {n} | select **n-th** item of curent node| object
  key | select node chilld **by name**| object
 "key"| select node chilld **by name**| object
- \>  | mark current node as seleced |-
+ \>  | mark current node as seleced |f-
  a=b | check if current node has child 'a' with value 'b' |object
 
 
@@ -39,7 +39,7 @@ key > [0]
 this pattern will match one element by:
 
 1. selecting "key" element in root node (assuring that is an object)
-2. select first element in it (assumintg its and array) 
+2. select first element in it (assumintg its an array) 
 
 example 2: 
 
