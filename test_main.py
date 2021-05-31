@@ -108,10 +108,3 @@ def test_main_cli_modify__strings():
     temp='{"a":0}'
     ret = cli_modify('*', 'TEST', temp)
     assert ret == '{"a":TEST}'
-
-
-# PROBLEM
-# def test_main_cli_modify__strings():
-#     """ cli_modify with strings """
-#     ret = cli_modify("a > *", "DUPA", "{'a':1}")
-#     assert ret == '{"a":TEST}'

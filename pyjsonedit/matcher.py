@@ -26,6 +26,7 @@ def _has_child_with_value(node:JsonNode, name, value) -> bool:
 def _match_node(node:JsonNode, patterns, depth=0):
     """[generator]"""
     try:
+
         if depth >= len(patterns) or not patterns[depth].strip():
             yield node
             return
@@ -33,7 +34,7 @@ def _match_node(node:JsonNode, patterns, depth=0):
         pattern = patterns[depth].strip()
 
         # match all
-        if pattern == '*':
+        if pattern == '*' and node.type != 'value':
             for k in node.kids:
                 yield from _match_node( k, patterns, depth+1)
             return

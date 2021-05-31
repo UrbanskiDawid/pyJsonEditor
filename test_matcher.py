@@ -118,3 +118,12 @@ def test_match_by_child_value():
     pattern2 = 'key=val2'
     ret=list(matcher.match(node, pattern2))
     assert ret == []
+
+
+def test_main_cli_modify__not_a_node():
+    """ mathchin to deep (value) in object """
+    kid1 = JsonNode('value',start=4,end=5, value='1', name='a')
+    node = JsonNode('dict', start=0, end=2, kids=[ kid1 ])
+
+    ret = list(matcher.match(node, "a > *"))
+    assert ret == [matcher.MatchException('pattern "*" not found')]
