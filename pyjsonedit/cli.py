@@ -23,7 +23,7 @@ def cli_match_mask(pattern, jsons, symbol, color):
               example:
                  " key > * "
               for more details see https://github.com/UrbanskiDawid/pyJsonEditor#readme
-   
+
     \b
     jsons - string with json or
             file name with json
