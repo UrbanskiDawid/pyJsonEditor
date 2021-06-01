@@ -40,14 +40,15 @@ class NodeModifyActionByCode:
         """
         with open(file_name) as file:
             code = compile( file.read()+
-                            '\nmodify_ret_val = modify(node)',
+                            '\nmodify_ret_val = modify(node,context)',
                             "template code",
                             'exec')
         return code
 
-    def __call__(self, node):
+    def __call__(self, node, context):
         env = {'modify_ret_val':"",
-                'node': node}
+               'node': node,
+               'context': context}
         exec(self.code, {}, env)
         return env['modify_ret_val']
 
@@ -65,5 +66,5 @@ class NodeModifyActionByString:
         """ check if this class can be build with this arg"""
         return isinstance(file_name_or_string, str)
 
-    def __call__(self, _):
+    def __call__(self, _node, _context):
         return self.template

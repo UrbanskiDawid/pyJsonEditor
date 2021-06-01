@@ -107,9 +107,12 @@ example 2: python code:
 file **/home/dave/somefile.py**
 ```python
 #!/usr/bin/python3
-def modify(node):
-   return "'<"+str(1+1)+">'"
+def modify(node,ctx):
+   return "'<"+str(1)+">'"
 ```
+node - matched node
+
+ctx - context in witch node was matched: file_name & match_nr
 
 ```bash
 pyjsonedit-modify "*" /home/dave/somefile.py "{'a':1}"

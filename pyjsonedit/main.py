@@ -4,6 +4,7 @@
 from io import StringIO
 from typing import List
 import os
+from collections import namedtuple
 import tempfile
 from pyjsonedit.tokenizer import tokenize
 from pyjsonedit.tree import parse as tree_parse
@@ -11,6 +12,8 @@ from pyjsonedit.tree import JsonNode
 from pyjsonedit.matcher import match, match_as_string
 from pyjsonedit.editor import Modifications, write_with_modifications
 from pyjsonedit.node_modify_action import build_node_modify_action
+
+NodeMatchContext = namedtuple("NodeMatchContext", "file_name match_nr")
 
 def __get_tokens(json) -> List:
     tokens=[]
@@ -56,10 +59,14 @@ def cli_match_mask(pattern, json, symbol, color, callback=print):
         ret = match_as_string(json, node, pattern, symbol, color)
         callback(ret)
 
+
+
+
 def modify_matched_nodes_with_callback(
     pattern:str,
     input_reader,
     output_writer,
+    file_name,
     on_match_user_callback):
     """
     Change matched nodes of intput stream with 'on_match_user_callback'
@@ -69,10 +76,13 @@ def modify_matched_nodes_with_callback(
 
     tokens = list(tokenize(input_reader))
     tree = tree_parse(tokens)
+    match_nr = 0
     for node in match(tree, pattern):
         if not isinstance(node, JsonNode):
             raise node
-        mod = on_match_user_callback(node)
+        ctx = NodeMatchContext(file_name=file_name, match_nr=match_nr)
+        match_nr += 1
+        mod = on_match_user_callback(node, ctx)
         if mod:
             modifications.add(node.start,node.end, mod)
 
@@ -80,7 +90,7 @@ def modify_matched_nodes_with_callback(
     write_with_modifications(input_reader, modifications, output_writer)
 
 
-def cli_modify(pattern:str, template:str, insert:bool, json_input):
+def cli_modify(pattern:str, template:str, insert:bool, json_string_or_file_name):
     """
     interface to access 'modify_matched_nodes_with_callback'
     with both file and sting as input
@@ -89,25 +99,27 @@ def cli_modify(pattern:str, template:str, insert:bool, json_input):
     """
     node_action = build_node_modify_action(template)
 
-    if os.path.isfile(json_input):
+    if os.path.isfile(json_string_or_file_name):
         with tempfile.TemporaryFile(mode="w+") as json_writer:
-            with open(json_input) as json_reader:
+            with open(json_string_or_file_name) as json_reader:
                 modify_matched_nodes_with_callback(pattern,
                                                    json_reader, json_writer,
+                                                   json_string_or_file_name,
                                                    node_action)
             json_writer.seek(0)
             if insert:
-                with open(json_input, 'w') as out:
+                with open(json_string_or_file_name, 'w') as out:
                     out.write(json_writer.read())
             else:
                 ret = json_writer.read()
                 print(ret)
-            return json_input
+            return json_string_or_file_name
     else:
         with StringIO() as json_writer:
-            with StringIO(json_input) as json_reader:
+            with StringIO(json_string_or_file_name) as json_reader:
                 modify_matched_nodes_with_callback(pattern,
                                                    json_reader, json_writer,
+                                                   None,
                                                    node_action)
             json_writer.seek(0)
             ret = json_writer.read()

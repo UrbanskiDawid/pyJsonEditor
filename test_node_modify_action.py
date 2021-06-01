@@ -22,14 +22,14 @@ def test__node_modify_action__by_string():
     """ NodeModifyActionByString test """
     test_str='test'
     action = sut.NodeModifyActionByString(test_str)
-    assert action(None) == test_str
+    assert action(None,None) == test_str
 
 def test__node_modify_action__by_code():
     """ NodeModifyActionByCode test """
-    code = b'def modify(node): return "test";'
+    code = b'def modify(node,context): return node+context;'
 
     with tempfile.NamedTemporaryFile(suffix='.py') as temp:
         temp.write(code)
         temp.seek(0)
         action = sut.NodeModifyActionByCode(temp.name)
-        assert action(None) == 'test'
+        assert action('te','st') == 'test'

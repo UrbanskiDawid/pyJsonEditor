@@ -67,29 +67,29 @@ def test_main_modify_matched_nodes_with_callback():
     """basic callback test"""
     writer = StringIO()
     reader = StringIO("{ 'a': 0 }")
-    def do_nothing(_):
+    def do_nothing(_node,_context):
         pass
-    modify_matched_nodes_with_callback('*', reader, writer, do_nothing)
+    modify_matched_nodes_with_callback('*', reader, writer, None, do_nothing)
 
 
 def test_main_modify_matched_nodes_with_callback_fail_match():
     """MatchException for not found pattern"""
     writer = StringIO()
     reader = StringIO("{ 'a': 0 }")
-    def do_nothing(_):
+    def do_nothing(_node, _context):
         pass
 
     with pytest.raises(MatchException, match=r'pattern "WRONG" not found'):
-        modify_matched_nodes_with_callback('WRONG', reader, writer, do_nothing)
+        modify_matched_nodes_with_callback('WRONG', reader, writer, None, do_nothing)
 
 
 def test_main_modify_matched_nodes_with_callback_replace():
     """replace value with callback"""
     writer = StringIO()
     reader = StringIO("{ 'a': 0 }")
-    def do_work(_):
+    def do_work(_node, _context):
         return "?"
-    modify_matched_nodes_with_callback('*', reader, writer, do_work)
+    modify_matched_nodes_with_callback('*', reader, writer, None, do_work)
 
 
 def test_main_cli_modify__file():
