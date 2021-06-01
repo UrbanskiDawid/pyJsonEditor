@@ -26,7 +26,7 @@ selector | action | node type
  {n} | select **n-th** item of curent node| object
  key | select node chilld **by name**| object
 "key"| select node chilld **by name**| object
- \>  | mark current node as seleced |f-
+ \>  | mark current node as seleced |-
  a=b | check if current node has child 'a' with value 'b' |object
 
 
@@ -93,17 +93,27 @@ $ pyjsonedit-modify --help
 ```
 Usage: pyjsonedit-modify [OPTIONS] PATTERN TEMPLATE [JSONS]...
 
-  cli method for masking matching parts of json
-
-Options:
-  --insert  don't print save to file
-  --help    Show this message and exit.
+  cli method for modifying matching parts of json
 ```
 
-example:
+example 1: simple string
 ```
 pyjsonedit-modify "pass" 'P@$W&$d' "{'pass':123}"
 {'pass':P@$W&$d}
+```
+
+example 2: python code:
+
+file **/home/dave/somefile.py**
+```python
+#!/usr/bin/python3
+def modify(node):
+   return "'<"+str(1+1)+">'"
+```
+
+```bash
+pyjsonedit-modify "*" /home/dave/somefile.py "{'a':1}"
+{'a':'<2>'}
 ```
 
 ## example: mask multiple nodes
