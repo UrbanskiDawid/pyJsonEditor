@@ -66,6 +66,7 @@ confidence=
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
 disable=print-statement,
+        exec-used,
         parameter-unpacking,
         unpacking-in-except,
         old-raise-syntax,

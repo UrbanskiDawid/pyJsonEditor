@@ -10,6 +10,7 @@ from pyjsonedit.tree import parse as tree_parse
 from pyjsonedit.tree import JsonNode
 from pyjsonedit.matcher import match, match_as_string
 from pyjsonedit.editor import Modifications, write_with_modifications
+from pyjsonedit.node_modify_action import build_node_modify_action
 
 def __get_tokens(json) -> List:
     tokens=[]
@@ -86,12 +87,14 @@ def cli_modify(pattern:str, template:str, insert:bool, json_input):
 
     insert - if true save chanes to file, else print
     """
+    node_action = build_node_modify_action(template)
+
     if os.path.isfile(json_input):
         with tempfile.TemporaryFile(mode="w+") as json_writer:
             with open(json_input) as json_reader:
                 modify_matched_nodes_with_callback(pattern,
                                                    json_reader, json_writer,
-                                                   lambda _: template)
+                                                   node_action)
             json_writer.seek(0)
             if insert:
                 with open(json_input, 'w') as out:
@@ -105,7 +108,7 @@ def cli_modify(pattern:str, template:str, insert:bool, json_input):
             with StringIO(json_input) as json_reader:
                 modify_matched_nodes_with_callback(pattern,
                                                    json_reader, json_writer,
-                                                   lambda _: template)
+                                                   node_action)
             json_writer.seek(0)
             ret = json_writer.read()
             print(ret)
