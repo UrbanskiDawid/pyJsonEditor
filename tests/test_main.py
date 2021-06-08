@@ -2,10 +2,9 @@
 """main file to see execution"""
 
 import tempfile
-from io import StringIO
 import pytest
 from pyjsonedit.main import string_to_tokens, string_to_tree,string_match_mark
-from pyjsonedit.main import cli_match_mask,modify_matched_nodes_with_callback,cli_modify
+from pyjsonedit.main import cli_match_mask,cli_modify
 from pyjsonedit.tree import JsonNode
 from pyjsonedit.matcher import MatchException
 
@@ -63,36 +62,7 @@ def test_cli_match_mark():
     assert ret == ['XX']
 
 
-def test_main_modify_matched_nodes_with_callback():
-    """basic callback test"""
-    writer = StringIO()
-    reader = StringIO("{ 'a': 0 }")
-    def do_nothing(_node,_context):
-        pass
-    modify_matched_nodes_with_callback('*', reader, writer, None, do_nothing)
-
-
-def test_main_modify_matched_nodes_with_callback_fail_match():
-    """MatchException for not found pattern"""
-    writer = StringIO()
-    reader = StringIO("{ 'a': 0 }")
-    def do_nothing(_node, _context):
-        pass
-
-    with pytest.raises(MatchException, match=r'pattern "WRONG" not found'):
-        modify_matched_nodes_with_callback('WRONG', reader, writer, None, do_nothing)
-
-
-def test_main_modify_matched_nodes_with_callback_replace():
-    """replace value with callback"""
-    writer = StringIO()
-    reader = StringIO("{ 'a': 0 }")
-    def do_work(_node, _context):
-        return "?"
-    modify_matched_nodes_with_callback('*', reader, writer, None, do_work)
-
-
-def test_main_cli_modify__file():
+def test_main_cli_modify__file(capfd):
     """ cli_modify with files """
     with tempfile.NamedTemporaryFile() as temp:
         temp.write(b'{"a":0}')
@@ -102,8 +72,9 @@ def test_main_cli_modify__file():
         temp.seek(0)
         out=temp.read()
         assert out == b'{"a":TEST}'
+        assert capfd.readouterr().out == ''
 
-def test_main_cli_modify__file_no_insert():
+def test_main_cli_modify__file_no_insert(capfd):
     """ cli_modify with files """
     with tempfile.NamedTemporaryFile() as temp:
         temp.write(b'{"a":0}')
@@ -113,9 +84,32 @@ def test_main_cli_modify__file_no_insert():
         temp.seek(0)
         out=temp.read()
         assert out == b'{"a":0}'
+        assert capfd.readouterr().out == '{"a":TEST}'
 
-def test_main_cli_modify__strings():
+def test_main_cli_modify__strings(capfd):
     """ cli_modify with strings """
     temp='{"a":0}'
-    ret = cli_modify('*', 'TEST', False, temp)
-    assert ret == '{"a":TEST}'
+    cli_modify('*', 'TEST', False, temp)
+    captured = capfd.readouterr()
+    assert captured.out == '{"a":TEST}'
+
+
+def test_main_cli_modify__strings_exception():
+    """ cli_modify with strings """
+    temp = '{"a":0}'
+    expected = 'pattern "error" not found'
+    with pytest.raises(MatchException, match=expected):
+        cli_modify('error', 'TEST', False, temp)
+
+
+def test_main_cli_modify__strings_with_code(capfd):
+    """ cli_modify with strings """
+    json='{"a":99,"b":99}'
+    code = b'def modify(node,context): return str(context.match_nr);'
+    with tempfile.NamedTemporaryFile(suffix='.py') as template:
+        template.write(code)
+        template.seek(0)
+
+        cli_modify('*', template.name, False, json)
+        captured = capfd.readouterr()
+        assert captured.out == '{"a":0,"b":1}'
