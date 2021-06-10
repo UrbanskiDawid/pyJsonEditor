@@ -1,15 +1,21 @@
 """
 modifications/edits done to input json
 """
+from typing import Callable,List
+from collections import namedtuple
+from pyjsonedit.parser import JsonNode
+
+
+NodeMatchContext = namedtuple("NodeMatchContext", "file_name match_nr node")
 
 class Modification:
     """
     text slice with start&end postion
     """
-    def __init__(self, start:int, end:int, text:str):
+    def __init__(self, start:int, end:int, context:str):
         self.start= start
         self.end  = end
-        self.text = text
+        self.context = context
 
     def is_pos_inside(self, pos:int):
         """
@@ -18,7 +24,7 @@ class Modification:
         return self.end> pos >= self.start
 
     def __repr__(self):
-        return f'Modification[{self.start}:{self.end}]{self.text}'
+        return f'Modification[{self.start}:{self.end}]='+str(self.context)
 
 class Modifications:
     """list of Modifications"""
@@ -34,11 +40,11 @@ class Modifications:
                 return i
         return False
 
-    def add(self, start:int, end:int, raw, strict=True):
+    def add(self, start:int, end:int, context, strict=True):
         """
-        start position in input string
-        end   position in input string
-        raw   representation of modification as string
+        start    position in input string
+        end      position in input string
+        context  matching context
         strict if set you can't add overlaping modifications
         returns: Modification on success
         """
@@ -47,14 +53,28 @@ class Modifications:
                 if i.is_pos_inside(start) or i.is_pos_inside(end):
                     return False
 
-        mod = Modification(start,end, raw)
+        mod = Modification(start,end, context)
         self.modifications.append(mod)
         return mod
 
 
-def write_with_modifications(input_reader,
-                             modifications:Modifications,
-                             output_writer):
+def editor_build_for_matching_nodes(matched_nodes:List[JsonNode],
+                                    context_file_name:str) -> Modifications:
+    """
+    run user action on all matching tree nodes
+    """
+    modifications = Modifications()
+
+    for match_nr,node in enumerate(matched_nodes):
+        ctx = NodeMatchContext(file_name=context_file_name, match_nr=match_nr, node=node)
+        modifications.add(node.start,node.end,ctx)
+
+    return modifications
+
+def edit(input_reader,
+         modifications:Modifications,
+         node_action:Callable[...,str],
+         output_writer):
     """
     apply modification to string
     """
@@ -62,10 +82,15 @@ def write_with_modifications(input_reader,
     while True:
         mod = modifications.find_starts_at(pos)
         if mod:
-            output_writer.write(mod.text)
             jump = mod.end-pos
-            input_reader.read(jump)
+            raw = input_reader.read(jump)
             pos += jump
+
+            out = node_action(raw, mod.context)
+            if out:
+                output_writer.write(out)
+            else:
+                output_writer.write(raw)
             continue
 
         char = input_reader.read(1)

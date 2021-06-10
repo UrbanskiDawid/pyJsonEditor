@@ -1,5 +1,6 @@
 """module exports"""
 from .tokenizer import tokenize
-from .main import string_to_tokens,string_to_tree,string_match_mark
-from .matcher import MatchException,match,match_as_string
-from .tree import JsonNode, parse
+from .matcher import match, match_as_list, MatchException
+from .parser import parse
+from .editor import edit, Modification, Modifications
+from .main import modify, string_match_mark

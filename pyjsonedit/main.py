@@ -3,119 +3,63 @@
 
 from contextlib import closing
 from io import StringIO, TextIOWrapper
-from typing import List
 import os
-from collections import namedtuple
 from pyjsonedit.tokenizer import tokenize
-from pyjsonedit.tree import parse as tree_parse
-from pyjsonedit.tree import JsonNode
-from pyjsonedit.matcher import match, match_as_string
-from pyjsonedit.editor import Modifications, write_with_modifications
+from pyjsonedit.parser import parse
+from pyjsonedit.matcher import match_as_list
+from pyjsonedit.editor import edit, editor_build_for_matching_nodes
 from pyjsonedit.node_modify_action import build_node_modify_action
 
 
-def __get_json_reader(json, writeable=False) -> TextIOWrapper:
-    """ select file or raw string input"""
+def __get_json_reader(json:str, writeable=False) -> TextIOWrapper:
+    """ create reader from either raw string or file path"""
     if os.path.isfile(json):
         return closing(open(json, 'r+' if writeable else 'r'))
     return closing(StringIO(json))
 
-def __get_tokens(json) -> List:
-    tokens=[]
-    with __get_json_reader(json) as reader:
-        tokens = list(tokenize(reader))
-    return tokens
+def __read_tree(reader:TextIOWrapper):
+    """ read JsonNode tree from json reader """
+    return parse(list(tokenize(reader)))
 
-def string_to_tokens(json_str: str) -> List:
-    """
-    python3 -c 'from main import *; print( string_to_tokens("{}") );'
-    """
-    return __get_tokens(json_str)
-
-def string_to_tree(json_str: str) -> JsonNode:
-    """
-    python3 -c 'from main import *; r=string_to_tree("{}"); print(r)'
-    """
-    tokens = __get_tokens(json_str)
-    return tree_parse(tokens)
-
-def string_match_mark(json, pattern, symbol='X', color=None):
-    """mark part of matched json"""
-    tokens = __get_tokens(json)
-    node = tree_parse(tokens)
-    return match_as_string(json, node, pattern, symbol, color)
-
-def cli_match_mask(pattern, json, symbol, color, callback=print):
-    """cli method for masking matching parts of json"""
-
-    tokens = []
-    if os.path.isfile(json):
-        with open(json) as handle:
-            json = handle.read()
-
-    with StringIO(json) as handle:
-        tokens = list(tokenize(handle))
-
-        node = tree_parse(tokens)
-        ret = match_as_string(json, node, pattern, symbol, color)
-        callback(ret)
-
-
-def __build_modification_for_matching_nodes(tree,
-                                            pattern,
-                                            node_action,
-                                            context_file_name) -> Modifications:
-    """
-    run user action on all matching tree nodes
-    """
-    modifications = Modifications()
-
-    NodeMatchContext = namedtuple("NodeMatchContext", "file_name match_nr")
-
-    match_nr = 0
-    for node in match(tree, pattern):
-        if not isinstance(node, JsonNode):
-            raise node
-        ctx = NodeMatchContext(file_name=context_file_name, match_nr=match_nr)
-        match_nr += 1
-
-        mod = node_action(node, ctx)
-        if mod:
-            modifications.add(node.start,node.end, mod)
-
-    return modifications
-
-
-def cli_modify(pattern:str,
-               template_string_or_file_name:str,
-               insert:bool,
-               json_string_or_file_name:str):
+def modify(pattern:str,
+           json_string_or_file_name:str,
+           template_string_or_file_name_or_char:str,
+           insert:bool = False,
+           print_out=True):
     """
     interface to access 'modify_matched_nodes_with_callback'
     with both file and sting as input
 
-    insert - if true save chanes to file, else print
+    pattern -
+        string with patern to match one on multiple nodes
+    json_string_or_file_name -
+        json, either raw string or full file path of json
+    template_string_or_file_name_or_char -
+        this will replace each marched node, either raw string of full file path of python code
+    insert -
+        if true save chanes to file, else print
     """
-    node_action = build_node_modify_action(template_string_or_file_name)
+    node_action = build_node_modify_action(template_string_or_file_name_or_char)
 
     with __get_json_reader(json_string_or_file_name,
                            writeable=insert) as json_reader:
 
         #step1 - read all tokens -> tree
-        tree = tree_parse(list(tokenize(json_reader)))
+        tree = __read_tree(json_reader)
+
+        matched_nodes = match_as_list(tree, pattern)
 
         #step2 - match nodes by pattern and run user action on each match
         file_name = json_reader.name if hasattr(json_reader, 'name') else ''
-        modifications = __build_modification_for_matching_nodes(
-                            tree,
-                            pattern,
-                            node_action,
-                            file_name)
+        modifications = editor_build_for_matching_nodes(matched_nodes, file_name)
 
         #step3 - write modified output to temporary buffer
         with StringIO() as json_writer:
             json_reader.seek(0)
-            write_with_modifications(json_reader, modifications, json_writer)
+            edit(json_reader,
+                 modifications,
+                 node_action,
+                 json_writer)
 
             #step3 - show results
             json_reader.seek(0)
@@ -127,6 +71,19 @@ def cli_modify(pattern:str,
                 json_reader.truncate(0)
                 output_to = json_reader
 
-            print(json_writer.getvalue(),
-                  file=output_to,
-                  end='')
+            if print_out or save_to_file:
+                print(json_writer.getvalue(),
+                      file=output_to,
+                      end='')
+                return ''
+
+            return json_writer.getvalue()
+
+
+def string_match_mark(json, pattern, symbol='X'):
+    """ easy interface for api/user """
+    return modify(pattern,
+                  json,
+                  symbol,
+                  insert=False,
+                  print_out=False)

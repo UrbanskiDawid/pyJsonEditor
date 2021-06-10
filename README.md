@@ -72,11 +72,11 @@ $ pyjsonedit-mask --help
 ```
 Usage: pyjsonedit-mask [OPTIONS] PATTERN [JSONS]...
 
-  cli method for masking matching parts of json
+  Select and mask parts of json
 
 Options:
   --symbol TEXT
-  --color        enable color output
+  -i, --insert   save changes to file
   --help         Show this message and exit.
 ```
 
@@ -93,7 +93,11 @@ $ pyjsonedit-modify --help
 ```
 Usage: pyjsonedit-modify [OPTIONS] PATTERN TEMPLATE [JSONS]...
 
-  cli method for modifying matching parts of json
+  select and modify parts of json
+
+Options:
+  -i, --insert  save changes to file
+  --help        Show this message and exit.
 ```
 
 example 1: simple string
@@ -116,7 +120,7 @@ ctx - context in witch node was matched: file_name & match_nr
 
 ```bash
 pyjsonedit-modify "*" /home/dave/somefile.py "{'a':1}"
-{'a':'<2>'}
+{'a':'<1>'}
 ```
 
 ## example: mask multiple nodes

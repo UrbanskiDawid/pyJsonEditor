@@ -3,63 +3,8 @@
 
 import tempfile
 import pytest
-from pyjsonedit.main import string_to_tokens, string_to_tree,string_match_mark
-from pyjsonedit.main import cli_match_mask,cli_modify
-from pyjsonedit.tree import JsonNode
+from pyjsonedit import main
 from pyjsonedit.matcher import MatchException
-
-def test_get_tokens__file():
-    """test __get_tokens for files"""
-    with tempfile.NamedTemporaryFile() as temp:
-        json = temp.name
-        temp.write(b'{}')
-        temp.seek(0)
-        ret = string_to_tokens(json)
-        assert ret == [('{', 0), ('}', 1)]
-
-def test_string_to_tokens():
-    """test string_to_tokens"""
-    json = "{}"
-    ret = string_to_tokens(json)
-    assert ret == [('{', 0), ('}', 1)]
-
-def test_string_to_tree():
-    """test string_to_tree"""
-    json = "{}"
-    ret = string_to_tree(json)
-    assert ret == JsonNode('dict', start=0, end=2)
-
-def test_string_match_mark():
-    """ minimal string_match_mark test """
-    json = "{}"
-    ret = string_match_mark(json, "", symbol='X')
-    assert ret == "XX"
-
-def test_password_masking():
-    """test example usage"""
-    ret = string_match_mark('{"pass":"#RFDS"}','pass')
-    assert ret == '{"pass":XXXXXXX}'
-
-    ret = string_match_mark("""{"pass":  '#RFDS'  }""",'pass')
-    assert ret == '{"pass":  XXXXXXX  }'
-
-def test_cli_match_mark():
-    """test cli_match_mark"""
-    ret=[]
-    def test_print_mock(val):
-        ret.append(val)
-
-    with tempfile.NamedTemporaryFile() as temp:
-        temp.write(b'{}')
-        temp.seek(0)
-
-        cli_match_mask("",
-                       temp.name,
-                       symbol="X",
-                       color=False,
-                       callback=test_print_mock)
-
-    assert ret == ['XX']
 
 
 def test_main_cli_modify__file(capfd):
@@ -67,7 +12,7 @@ def test_main_cli_modify__file(capfd):
     with tempfile.NamedTemporaryFile() as temp:
         temp.write(b'{"a":0}')
         temp.seek(0)
-        cli_modify('*', 'TEST', True, temp.name)
+        main.modify('*', temp.name, 'TEST', True)
 
         temp.seek(0)
         out=temp.read()
@@ -79,7 +24,7 @@ def test_main_cli_modify__file_no_insert(capfd):
     with tempfile.NamedTemporaryFile() as temp:
         temp.write(b'{"a":0}')
         temp.seek(0)
-        cli_modify('*', 'TEST', False, temp.name)
+        main.modify('*', temp.name, 'TEST', False)
 
         temp.seek(0)
         out=temp.read()
@@ -89,7 +34,7 @@ def test_main_cli_modify__file_no_insert(capfd):
 def test_main_cli_modify__strings(capfd):
     """ cli_modify with strings """
     temp='{"a":0}'
-    cli_modify('*', 'TEST', False, temp)
+    main.modify('*', temp, 'TEST', False)
     captured = capfd.readouterr()
     assert captured.out == '{"a":TEST}'
 
@@ -99,7 +44,7 @@ def test_main_cli_modify__strings_exception():
     temp = '{"a":0}'
     expected = 'pattern "error" not found'
     with pytest.raises(MatchException, match=expected):
-        cli_modify('error', 'TEST', False, temp)
+        main.modify('error', temp, 'TEST', False)
 
 
 def test_main_cli_modify__strings_with_code(capfd):
@@ -110,6 +55,30 @@ def test_main_cli_modify__strings_with_code(capfd):
         template.write(code)
         template.seek(0)
 
-        cli_modify('*', template.name, False, json)
+        main.modify('*', json, template.name, False)
         captured = capfd.readouterr()
         assert captured.out == '{"a":0,"b":1}'
+
+
+def test_main_cli_modify__file_with_code(capfd):
+    """ cli_modify with strings """
+    with tempfile.NamedTemporaryFile(suffix='.json') as json:
+        json.write(b'{"a":99,"b":99}')
+        json.seek(0)
+
+        code = b'def modify(node,context): return str(context.match_nr);'
+        with tempfile.NamedTemporaryFile(suffix='.py') as template:
+            template.write(code)
+            template.seek(0)
+
+            main.modify('*', json.name, template.name, False)
+            captured = capfd.readouterr()
+            assert captured.out == '{"a":0,"b":1}'
+
+
+def test_string_match_mark(capsys):
+    """ test function from README """
+    ret = main.string_match_mark("{'pass':123}","pass")
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert ret == "{'pass':XXX}"

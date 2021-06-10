@@ -5,10 +5,10 @@ import click
 from pyjsonedit import main
 
 @click.argument('pattern')
-@click.argument('jsons', nargs=-1)
 @click.option('--symbol', default='X', help='')
-@click.option('--color', default=True, is_flag=True, help='enable color output')
-def cli_match_mask(pattern, jsons, symbol, color):
+@click.option('-i','--insert', default=False, is_flag=True, help="save changes to file")
+@click.argument('jsons', nargs=-1)
+def cli_match_mask(pattern, symbol, insert, jsons):
     """select and mask parts of json
 
     \b
@@ -31,12 +31,9 @@ def cli_match_mask(pattern, jsons, symbol, color):
 
     \b
     jsons - character to mask orgial values
-
-    \b
-    color - for fancy terminals with color
     """
     for json in jsons:
-        main.cli_match_mask(pattern, json, symbol, color)
+        main.modify(pattern, json, symbol, insert)
 
 def run_mask():
     """this method is used by package installer"""
@@ -80,7 +77,7 @@ def cli_modify(pattern, template, insert, jsons):
             use "-i" flag to save changes to file
     """
     for json in jsons:
-        main.cli_modify(pattern, template, insert, json)
+        main.modify(pattern, json, template, insert)
 
 def run_modify():
     """this method is used by package installer"""

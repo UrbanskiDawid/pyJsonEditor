@@ -1,9 +1,8 @@
 """
 this module alows to freely move throug JsonNode's
 """
-import pytest
 from pyjsonedit import matcher
-from pyjsonedit.tree import JsonNode
+from pyjsonedit.parser import JsonNode
 
 def test_match():
     """ minimal test """
@@ -79,23 +78,6 @@ def test_match_array__not_found():
     pattern = 'WUUUT'
     ret = list(matcher.match(node, pattern))
     assert ret == [matcher.MatchException('pattern "WUUUT" not found')]
-
-
-def test_print_matched__exception():
-    """ exceptions tests """
-    node = JsonNode('dict', start=0, end=2, kids=[ ])
-    pattern = 'WUT'
-    expected='pattern "WUT" not found'
-
-    with pytest.raises(matcher.MatchException, match=expected):
-        matcher.match_as_string('{}', node, pattern)
-
-def test_print_matched__color():
-    """ exceptions tests """
-    node = JsonNode('dict', start=0, end=2, kids=[ ])
-    pattern  = ''
-    ret = matcher.match_as_string('{}', node, pattern, color=True)
-    assert ret == '\x1b[91mX\x1b[0m\x1b[91mX\x1b[0m'
 
 
 def test_match_all_in_array():

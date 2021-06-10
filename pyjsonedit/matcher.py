@@ -2,7 +2,8 @@
 this module alows to freely move throug JsonNode's
 """
 import re
-from pyjsonedit.tree import JsonNode
+from typing import Iterator, List
+from pyjsonedit.parser import JsonNode
 
 class MatchException(Exception):
     """failures in maching process"""
@@ -78,33 +79,17 @@ def _match_node(node:JsonNode, patterns, depth=0):
     except MatchException as fail:
         yield fail
 
-def match(root: JsonNode, pattern: str):
+def match(root: JsonNode, pattern: str) -> Iterator[JsonNode]:
     """ [generator] start node matching"""
     patterns = pattern.strip().split('>')
     yield from _match_node(root, patterns)
 
-def match_as_string(json_str, node:JsonNode, pattern:str, mark_symbol='X', color=False):
-    """retuns marked characters matching given 'pattern'"""
 
-    found = []
-    for i in match(node, pattern):
-        if isinstance(i, MatchException):
-            raise i
-        found.append( (i.start,i.end))
-
-    ret = ""
-    for i,char in enumerate(json_str):
-        mark = False
-        for start,end in found:
-            if start <= i < end:
-                mark = True
-                break
-        if color:
-            color = '\033[91m' if mark else '\033[92m'
-
-        if mark:
-            char=mark_symbol
-
-        ret += f'{color}{char}\033[0m' if color else char
-
+def match_as_list(tree:JsonNode, pattern:str) -> List[JsonNode]:
+    """ create list of matched JsonNode's using 'pattern' """
+    ret = []
+    for node in match(tree, pattern):
+        if not isinstance(node, JsonNode):
+            raise node
+        ret.append(node)
     return ret
