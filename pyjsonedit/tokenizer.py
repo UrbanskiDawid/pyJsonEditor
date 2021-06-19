@@ -2,7 +2,7 @@
 
 def __eat_string(char, handle):
     """
-      consume text starting and endig with 'char'
+      consume text starting and endig with 'char' 
     """
     start_c = char
     mem = ""
@@ -22,15 +22,6 @@ def tokenize(handle):
     pos = -1
     mem = ""
 
-    def yeild_mem(pos, mem):
-        if mem.strip():
-            mem2 = mem.strip()
-            if mem2[0] in ['"',"'"] and mem2[0]==mem2[-1]:
-                memLenLstrip = len(mem.lstrip())
-                yield("S", pos-memLenLstrip, mem2.strip("\"'"))
-            else:
-                yield("v", pos-len(mem), mem)
-
     while run:
         pos += 1
         char = handle.read(1)
@@ -38,16 +29,28 @@ def tokenize(handle):
             run = False
             break
 
-
         #normal mode
         if char in ['[', ']', '{', '}', ",", ":"]:
-            yield from yeild_mem(pos, mem)
+            if mem.strip():
+                yield("v", pos-len(mem), mem)
             mem = ""
 
             yield (char, pos)
 
+        #string mode
+        elif char in ['"', "'"]:
+            if mem.strip():
+                yield("v", pos-len(mem), mem)
+            mem = ""
+
+            success, text = __eat_string(char, handle)
+            if success:
+                yield ('S', pos, text)
+            else:
+                yield ('v', pos, char+text) # failed string
+
+            pos += len(text)+1
+
         # other chars
         else:
             mem += char
-
-    yield from yeild_mem(pos, mem)
