@@ -4,29 +4,33 @@ import pytest
 from pyjsonedit.tokenizer import tokenize
 
 testdata = [
-(
+(#0
     '{}',
     [('{',0), ('}',1) ]
 ),
-(
+(#1
     '{"a":0}',
     [('{', 0), ('S', 1, 'a'), (':', 4), ('v', 5, '0'), ('}', 6)]
 ),
-(
+(#2
     '{"a":"0"}',
     [('{', 0), ('S', 1, 'a'), (':', 4), ('S', 5, '0'), ('}', 8)]
 ),
-(
+(#3
     '{"a": "0"}',
     [('{', 0), ('S', 1, 'a'), (':', 4), ('S', 6, '0'), ('}', 9)]
 ),
-(
+(#4
     '{"a": "1234"}',
     [('{', 0), ('S', 1, 'a'), (':', 4), ('S', 6, '1234'), ('}', 12)]
 ),
-(   #note: with error
+(#5
+    '{"a" : "1234"}',
+    [('{', 0), ('S', 1, 'a'), (':', 5), ('S', 7, '1234'), ('}', 13)]
+),
+(#6   #note: with error
     '{"a":XX"0"}',
-    [('{', 0), ('S', 1, 'a'), (':', 4), ('v',5,'XX'), ('S', 7, '0'), ('}', 10)]
+    [('{', 0), ('S', 1, 'a'), (':', 4), ('v',5,'XX"0"'), ('}', 10)]
 ),
 (
     '{"a":0,"b":1}',
@@ -60,21 +64,28 @@ testdata = [
      ('}',11)]
 ),
 (
-    '{ "a":1, "b" : 123 }',
+    '{ "a":1, "b"  : 123 }',
     [('{', 0),
         ('S', 2, 'a'),(':',5),("v",6,'1'),
         (",",7),
-        ("S",9,'b'),(':', 13),('v',14,' 123 '),
-     ('}',19)]
+        ("S",9,'b'),(':', 14),('v',15,' 123 '),
+     ('}',20)]
 )
 ]
+
+def __assert_token_eq(result, expected):
+    for i in range(max(len(result),len(expected))):
+        res = result[i] if i < len(result) else 'MISSING'
+        exp = expected[i] if i < len(expected) else 'MISSING'
+        assert res == exp, f'token #{i} found:{res} expected:{exp}'
+
 
 @pytest.mark.parametrize("json,expected", testdata)
 def test_tokenize(json, expected):
     """ test tokenize method"""
     handle = StringIO(json)
-    ret=list(tokenize(handle))
-    assert ret == expected
+    ret = list(tokenize(handle))
+    __assert_token_eq(ret, expected)
 
 
 @pytest.mark.parametrize("json,expected", testdata)
