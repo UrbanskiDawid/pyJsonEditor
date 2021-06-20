@@ -1,6 +1,16 @@
 #!/bin/bash
 python3 -m pylint --rcfile=pylintrc `find -regextype egrep -regex '(.*.py)'`
 
+if test $? -ne 0
+then
+  echo "ERROR: LINT FAILED!"
+  exit 1
+fi
+
 python3 -m coverage run -m pytest && python3 -m coverage report --rcfile=.coveragerc
 
-exit $?
+if test $? -ne 0
+then
+  echo "ERROR: TEST&COVERAGE FAILED!"
+  exit 2
+fi
