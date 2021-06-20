@@ -82,3 +82,10 @@ def test_string_match_mark(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
     assert ret == "{'pass':XXX}"
+
+
+def test_string_tokenize():
+    """ test helper function """
+    ret = main.string_tokenize("{}")
+    expected = [('{', 0), ('}', 1)]
+    assert ret == expected

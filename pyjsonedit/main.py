@@ -87,3 +87,8 @@ def string_match_mark(json, pattern, symbol='X'):
                   symbol,
                   insert=False,
                   print_out=False)
+
+def string_tokenize(json_string:str):
+    """ return list of tokens from string """
+    with StringIO(json_string) as reader:
+        return list(tokenize(reader))
