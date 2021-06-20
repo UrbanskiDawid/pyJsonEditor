@@ -112,3 +112,9 @@ def test_string_tokenize():
     ret = main.string_tokenize("{}")
     expected = [('{', 0), ('}', 1)]
     assert ret == expected
+
+
+def test_string_match():
+    """ test helpe function """
+    ret = main.string_match("{}","")
+    return ret == "XX"
