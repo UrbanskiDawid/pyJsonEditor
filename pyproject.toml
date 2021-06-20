@@ -10,6 +10,7 @@ license = "MIT"
 authors = ["Dawid Urbanski <kontakt@dawidurbanski.pl>"]
 repository = "https://github.com/UrbanskiDawid/pyJsonEditor"
 readme = "README.md"
+include = ["pyjsonedit/*.py"]
 
 [tool.poetry.dependencies]
 python = '^3.6'

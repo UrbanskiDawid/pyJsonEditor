@@ -25,19 +25,19 @@
             "label": "package build",
             "type": "shell",
             "problemMatcher": [],
-            "command": "rm -rf dist/; python3 -m build --out dist/ && python3 -m twine check dist/*"
+            "command": "rm -rf dist/; python3 -m build --out dist/ && python3 -m twine check dist/* && tar -tf dist/pyJsonEdit-*.tar.gz"
         },
         {
             "label": "package install",
             "type": "shell",
             "problemMatcher": [],
-            "command": "pip3 install dist/pyJsonEdit-*.whl"
+            "command": "pip3 install dist/pyJsonEdit-*.tar.gz && pip3 show -f pyJsonEdit"
         },
         {
             "label": "package uninstall",
             "type": "shell",
             "problemMatcher": [],
-            "command": "yes|pip3 uninstall pyJsonEdit"
+            "command": "pip3 uninstall -y pyJsonEdit"
         },
         {
             "label": "generate code stats",
