@@ -58,7 +58,7 @@ def _match_node(node:JsonNode, patterns, depth=0):
 
         pattern = patterns[depth].strip()
 
-        #before after
+        #before/after
         if depth == len(patterns)-1:
             if pattern in [":after", ":before"]:
                 yield JsonNode(pattern,
@@ -100,9 +100,29 @@ def _match_node(node:JsonNode, patterns, depth=0):
     except MatchException as fail:
         yield fail
 
+def parse_pattern(pattern:str):
+    """ tokenize matching patter """
+    pattern = pattern.strip()
+
+    tail = None
+    for i in [":before",":after"]:
+        if pattern.endswith(i):
+            pattern = pattern[0:-len(i)].strip()
+            tail = i
+
+    ret = []
+    for pat in pattern.split('>'):
+        pat = pat.strip()
+        if pat:
+            ret.append(pat)
+
+    if tail:
+        ret.append(tail)
+    return ret
+
 def match(root: JsonNode, pattern: str) -> Iterator[JsonNode]:
     """ [generator] start node matching"""
-    patterns = pattern.strip().split('>')
+    patterns = parse_pattern(pattern)
     yield from _match_node(root, patterns)
 
 

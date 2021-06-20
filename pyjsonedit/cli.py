@@ -6,6 +6,7 @@ from os import linesep
 import click
 from pyjsonedit import main
 from pyjsonedit.token_list import TokenError
+from pyjsonedit.matcher import MatchException
 
 
 def on_token_error(json, token_error):
@@ -13,6 +14,10 @@ def on_token_error(json, token_error):
     print(f"Error: f{json}", token_error, file=sys.stderr, sep=linesep)
     sys.exit(1)
 
+def on_match_exception(json, match_exception):
+    """ print error and exit program """
+    print(f"Error: f{json}", match_exception, file=sys.stderr, sep=linesep)
+    sys.exit(2)
 
 @click.argument('pattern')
 @click.option('--symbol', default='X', help='')
@@ -47,6 +52,8 @@ def cli_match_mask(pattern, symbol, insert, jsons):
             main.modify(pattern, json, symbol, insert)
         except TokenError as token_error:
             on_token_error(json, token_error)
+        except MatchException as match_exception:
+            on_match_exception(json, match_exception)
 
 
 def run_mask():
@@ -95,6 +102,8 @@ def cli_modify(pattern, template, insert, jsons):
             main.modify(pattern, json, template, insert)
         except TokenError as token_error:
             on_token_error(json, token_error)
+        except MatchException as match_exception:
+            on_match_exception(json, match_exception)
 
 
 def run_modify():

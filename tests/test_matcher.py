@@ -1,6 +1,7 @@
 """
 this module alows to freely move throug JsonNode's
 """
+import pytest
 from pyjsonedit import matcher
 from pyjsonedit.parser import JsonNode
 
@@ -109,3 +110,21 @@ def test_main_cli_modify__not_a_node():
 
     ret = list(matcher.match(node, "a > *"))
     assert ret == [matcher.MatchException('pattern "*" not found')]
+
+
+testdata_patterns=[
+    ("", []),
+    (">", []),
+    ("a>b", ['a','b']),
+    (" a > b ", ['a','b']),
+    ("a>[0]", ['a','[0]']),
+    ("a>[1]>{2}>*", ['a','[1]','{2}','*']),
+    ("after :after", ['after',":after"]),
+    ("before :before", ['before',":before"]),
+]
+
+@pytest.mark.parametrize("text,expected", testdata_patterns)
+def test_parse_pattern(text, expected):
+    """ test matching pattern tokenizer """
+    ret = matcher.parse_pattern(text)
+    assert ret == expected

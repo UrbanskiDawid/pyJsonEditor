@@ -19,16 +19,17 @@ Now you can easly select **nodes** in json tree
 
 syntax:
 
-selector | action | node type
----------|--------|-------
-  *| select **all** items in current node| -
- [n] | select **n-th** item of curent node| array
- {n} | select **n-th** item of curent node| object
- key | select node chilld **by name**| object
-"key"| select node chilld **by name**| object
- \>  | mark current node as seleced |-
- a=b | check if current node has child 'a' with value 'b' |object
-
+selector | action | node type | comments
+---------|--------|-------|-------
+  *| select **all** items in current node| - |
+ [n] | select **n-th** item of curent node| array|
+ {n} | select **n-th** item of curent node| object|
+ key | select node chilld **by name**| object|
+"key"| select node chilld **by name**| object|
+ \>  | mark current node as seleced |-|
+ a=b | check if current node has child 'a' with value 'b' |object|
+| :before | add text before selected node| -| must at end of pattern
+| :after | add text after selected node  | -| must at end of pattern
 
 example 1: 
 

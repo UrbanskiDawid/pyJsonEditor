@@ -90,9 +90,19 @@ def test_match_after(capsys):
     assert captured.out == ""
     assert ret == "{'pass':123XXX}"
 
+    ret = main.string_match_mark("{'pass':123}"," *:after")
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert ret == "{'pass':123XXX}"
+
 def test_match_before(capsys):
     """ test function from README """
     ret = main.string_match_mark("{'pass':123}"," * > :before")
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert ret == "{'pass':XXX123}"
+
+    ret = main.string_match_mark("{'pass':123}"," *:before")
     captured = capsys.readouterr()
     assert captured.out == ""
     assert ret == "{'pass':XXX123}"
