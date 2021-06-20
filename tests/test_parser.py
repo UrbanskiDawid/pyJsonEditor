@@ -15,21 +15,27 @@ def test_json_node_to_string():
 
 
 testdata = [
-(   #{}
+(#0 #{}
     [('{', 0), ('}', 1)],
     JsonNode('dict', start=0, end=2)
 )
 ,
-(
-    # {'password':'value'}
-    [('{', 0), ('S', 1, 'password'), (':', 11), ('S', 12, 'aaa'), ('}', 17)],
+(#1 # {'password':'value'}
+    [('{', 0), ('s', 1, '"password"'), (':', 11), ('s', 12, '"aaa"'), ('}', 17)],
     JsonNode('dict',start=0,end=18,kids= [
         JsonNode('value',start=12,end=17,name="password", value="aaa")
     ])
 )
 ,
-(   #{"b":1}
-    [('{', 0), ('S', 1, 'b'), (':', 4), ('v', 5, '1'), ('}', 6)],
+(#2 # {'password':'value'}
+    [('{', 0), ('s', 1, "'password'"), (':', 11), ('s', 12, "'aaa'"), ('}', 17)],
+    JsonNode('dict',start=0,end=18,kids= [
+        JsonNode('value',start=12,end=17,name="password", value="aaa")
+    ])
+)
+,
+(#3 #{"b":1}
+    [('{', 0), ('s', 1, '"b"'), (':', 4), ('v', 5, '1'), ('}', 6)],
     JsonNode('dict',
        start=0,
        end=7,
@@ -38,11 +44,11 @@ testdata = [
        ])
 )
 ,
-(   #{"b1":3,"b2":4}
+(#4 #{"b1":3,"b2":4}
     [('{', 0),
-       ('S', 1, 'b1'), (':', 5), ('v', 6, '3'),
+       ('s', 1, '"b1"'), (':', 5), ('v', 6, '3'),
         (',', 7),
-       ('S', 8, 'b2'), (':', 12), ('v', 13, '4'), ('}', 14),
+       ('s', 8, '"b2"'), (':', 12), ('v', 13, '4'), ('}', 14),
      ('}', 15)],
     JsonNode('dict',
        start=0,
@@ -53,8 +59,8 @@ testdata = [
        ])
 )
 ,
-(   #{"c":[]}
-    [('{', 0), ('S', 1, 'c'), (':', 4), ('[', 5), (']', 6), ('}', 7)],
+(#5 #{"c":[]}
+    [('{', 0), ('s', 1, '"c"'), (':', 4), ('[', 5), (']', 6), ('}', 7)],
     JsonNode('dict',
        start=0,
        end=8,
@@ -63,9 +69,9 @@ testdata = [
        ])
 )
 ,
-(   #{"c1":[2,3]}
+(#6 #{"c1":[2,3]}
     [('{', 0),
-     ('S', 1, 'c1'), (':', 5),
+     ('s', 1, '"c1"'), (':', 5),
         ('[', 6),
            ('v', 7, '2'),
            (',', 8),
@@ -82,8 +88,8 @@ testdata = [
             )
 )
 ,
-(   #{"d":{}}
-    [('{', 0), ('S', 1, 'd'), (':', 4), ('[', 5), (']', 6), ('}', 7)],
+(#7 #{"d":{}}
+    [('{', 0), ('s', 1, '"d"'), (':', 4), ('[', 5), (']', 6), ('}', 7)],
     JsonNode('dict',
        start=0,
        end=8,
@@ -92,12 +98,11 @@ testdata = [
        ])
 )
 ,
-(
-    #{"e":{"f":1}}
+(#8 #{"e":{"f":1}}
     [('{', 0),
-      ('S', 1, 'e'), (':', 4),
+      ('s', 1, '"e"'), (':', 4),
          ('{', 5),
-             ('S', 6, 'f'), (':', 9), ('v', 10, '1'),
+             ('s', 6, '"f"'), (':', 9), ('v', 10, '1'),
          ('}', 11),
       ('}', 12)],
     JsonNode('dict',
@@ -132,16 +137,16 @@ testdata_exceptions=[
     [('{',0)], 'TokenError at postion:1 object not closed'
 ),
 (
-    [('{',0),('S',1)], 'TokenError at postion:2 string token is missing value'
+    [('{',0),('s',1)], 'TokenError at postion:2 string token is missing value'
 ),
 (
-    [('{',0),('S',1,'s')],'TokenError at postion:2 missing ":"'
+    [('{',0),('s',1,'"s"')],'TokenError at postion:2 missing ":"'
 ),
 (
-    [('{',0),('S',1,'s'),(':',2)],'TokenError at postion:3 missing child'
+    [('{',0),('s',1,'"s"'),(':',2)],'TokenError at postion:3 missing child'
 ),
 (
-    [('{',0),('S',1,'s'),(':',2),('[',3)], 'TokenError at postion:4 array error, object not closed'
+    [('{',0),('s',1,'"s"'),(':',2),('[',3)],'TokenError at postion:4 array error, object not closed'
 ),
 ]
 

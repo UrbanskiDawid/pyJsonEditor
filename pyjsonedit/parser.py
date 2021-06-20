@@ -43,6 +43,9 @@ class JsonNode:
                 obj.name == self.name
 
 
+def __string_token_get_text(token):
+    """ get names without quotes"""
+    return token[2].strip("'\"")
 
 def eat_value(tok: TokenList) -> JsonNode:
     """
@@ -60,11 +63,11 @@ def eat_string(tok: TokenList) -> JsonNode:
     convert stirng tokens to object
     V -> JsonNode
     """
-    begin = tok.expect_pop('S', 'not a string')
+    token = tok.expect_pop('s', 'not a string')
     return JsonNode('value',
-                    start = begin[1],
-                    end   =(begin[1] + len(begin[2]) + 2),
-                    value = begin[2])
+                    start = token[1],
+                    end   =(token[1] + len(token[2])),
+                    value = __string_token_get_text(token))
 
 def eat_child(tok: TokenList) -> JsonNode:
     """
@@ -77,7 +80,7 @@ def eat_child(tok: TokenList) -> JsonNode:
         ret = eat_array(tok)
     elif tok.next_is('{'):
         ret = eat_dict(tok)
-    elif tok.next_is('S'):
+    elif tok.next_is('s'):
         ret = eat_string(tok)
     return ret
 
@@ -85,7 +88,7 @@ def eat_dict(tok:TokenList) -> JsonNode:
     """
     convert dict tokens to object,
     basicalyy array with named items
-    '{' 'S':(V|A|D)* '}'
+    '{' 's':(V|A|D)* '}'
     """
     begin = tok.expect_pop('{', 'not object')
     ret = JsonNode('dict',
@@ -94,16 +97,16 @@ def eat_dict(tok:TokenList) -> JsonNode:
 
     while tok.peek():
 
-        if tok.next_is('S'):
+        if tok.next_is('s'):
 
-            name = tok.pop()
-            if len(name) != 3 or not name[2]:
+            token_name = tok.pop()
+            if len(token_name) != 3 or not token_name[2]:
                 tok.raise_token_error('string token is missing value')
             tok.expect_pop(':', 'missing ":"')
             child = eat_child(tok)
             if not child:
                 tok.raise_token_error('missing child')
-            child.name = name[2]
+            child.name = __string_token_get_text(token_name)
             ret.append(child)
 
             if tok.next_is(','):

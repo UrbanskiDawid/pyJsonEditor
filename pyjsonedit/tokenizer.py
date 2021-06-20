@@ -4,16 +4,15 @@ def __eat_string(char, handle):
     """
       consume text starting and endig with 'char'
     """
-    start_c = char
-    mem = ""
+    mem = char
     while True:
         c_prev = char
         char = handle.read(1)
         if not char:
             break # fail: end of stream
-        if char == start_c and c_prev != "\\":
-            return (True,mem) # success
         mem += char
+        if char == mem[0] and c_prev != "\\":
+            return (True,mem) # success
     return (False,mem) # unfinished error
 
 def tokenize(handle):
@@ -45,11 +44,11 @@ def tokenize(handle):
 
             success, text = __eat_string(char, handle)
             if success:
-                yield ('S', pos, text)
+                yield ('s', pos, text)
             else:
-                yield ('v', pos, char+text) # failed string
+                yield ('v', pos, text) # failed string
 
-            pos += len(text)+1
+            pos += len(text) - 1
 
         # other chars
         else:
