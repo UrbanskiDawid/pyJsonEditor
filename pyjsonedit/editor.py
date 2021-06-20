@@ -82,15 +82,21 @@ def edit(input_reader,
     while True:
         mod = modifications.find_starts_at(pos)
         if mod:
+
             jump = mod.end-pos
             raw = input_reader.read(jump)
             pos += jump
 
             out = node_action(raw, mod.context)
-            if out:
-                output_writer.write(out)
-            else:
+
+            if mod.context.node.type == ":after":
                 output_writer.write(raw)
+                output_writer.write(out)
+            elif mod.context.node.type == ":before":
+                output_writer.write(out)
+                output_writer.write(raw)
+            else:
+                output_writer.write(out if out else raw)
             continue
 
         char = input_reader.read(1)

@@ -6,6 +6,7 @@ from io import StringIO
 from collections import namedtuple
 import pytest
 from pyjsonedit import editor
+from pyjsonedit.parser import JsonNode
 
 
 MockNode = namedtuple("MockNode", "start end")
@@ -108,7 +109,11 @@ testdata = [
 def test_edit(json, modifications, action, expected):
     """ editor.edit tests """
     mods = editor.Modifications()
-    context = "TESTcontext"
+    context = editor.NodeMatchContext(
+                  file_name="",
+                  match_nr=0,
+                  node=JsonNode('a', start=0, end=0)
+                )
     for start,end in modifications:
         mods.add(start,end, context)
 

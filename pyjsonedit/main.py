@@ -92,3 +92,16 @@ def string_tokenize(json_string:str):
     """ return list of tokens from string """
     with StringIO(json_string) as reader:
         return list(tokenize(reader))
+
+def string_match(json_string:str, pattern:str):
+    """ return list of tokens from string """
+    matched_nodes = None
+    with __get_json_reader(json_string,
+                           writeable=False) as json_reader:
+
+        #step1 - read all tokens -> tree
+        tree = __read_tree(json_reader)
+
+        matched_nodes = match_as_list(tree, pattern)
+
+    return matched_nodes
