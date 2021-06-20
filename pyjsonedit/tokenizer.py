@@ -2,7 +2,7 @@
 
 def __eat_string(char, handle):
     """
-      consume text starting and endig with 'char' 
+      consume text starting and endig with 'char'
     """
     start_c = char
     mem = ""
