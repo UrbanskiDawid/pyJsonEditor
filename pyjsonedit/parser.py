@@ -71,17 +71,17 @@ def eat_string(tok: TokenList) -> JsonNode:
 
 def eat_child(tok: TokenList) -> JsonNode:
     """
-    (S|V|A|D)
+    (V|S|A|D)
     """
     ret = None
     if   tok.next_is('v'):
         ret = eat_value(tok)
+    elif tok.next_is('s'):
+        ret = eat_string(tok)
     elif tok.next_is('['):
         ret = eat_array(tok)
     elif tok.next_is('{'):
         ret = eat_dict(tok)
-    elif tok.next_is('s'):
-        ret = eat_string(tok)
     return ret
 
 def eat_dict(tok:TokenList) -> JsonNode:
