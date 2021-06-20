@@ -1,8 +1,18 @@
 #!/usr/bin/python3
 """main file to see execution"""
 
+import sys
+from os import linesep
 import click
 from pyjsonedit import main
+from pyjsonedit.token_list import TokenError
+
+
+def on_token_error(json, token_error):
+    """ print error and exit program """
+    print(f"Error: f{json}", token_error, file=sys.stderr, sep=linesep)
+    sys.exit(1)
+
 
 @click.argument('pattern')
 @click.option('--symbol', default='X', help='')
@@ -33,7 +43,11 @@ def cli_match_mask(pattern, symbol, insert, jsons):
     jsons - character to mask orgial values
     """
     for json in jsons:
-        main.modify(pattern, json, symbol, insert)
+        try:
+            main.modify(pattern, json, symbol, insert)
+        except TokenError as token_error:
+            on_token_error(json, token_error)
+
 
 def run_mask():
     """this method is used by package installer"""
@@ -43,7 +57,7 @@ def run_mask():
 @click.argument('pattern')
 @click.argument('template')
 @click.option('-i','--insert', default=False, is_flag=True, help="save changes to file")
-@click.argument('jsons', nargs=-1)
+@click.argument('jsons', nargs=-1, required=True)
 def cli_modify(pattern, template, insert, jsons):
     """select and modify parts of json
 
@@ -77,7 +91,11 @@ def cli_modify(pattern, template, insert, jsons):
             use "-i" flag to save changes to file
     """
     for json in jsons:
-        main.modify(pattern, json, template, insert)
+        try:
+            main.modify(pattern, json, template, insert)
+        except TokenError as token_error:
+            on_token_error(json, token_error)
+
 
 def run_modify():
     """this method is used by package installer"""
